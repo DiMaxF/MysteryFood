@@ -89,9 +89,7 @@ public class AsyncImageView : View
             Texture2D texture = new Texture2D(2, 2);
             if (texture.LoadImage(imageBytes))
             {
-                _image.texture = texture;
-                UpdateAspectRatio(texture);
-                TriggerAction(path);
+                SuccessTrugger(texture);
             }
             else TriggerError();
             Loading(false);
@@ -110,9 +108,7 @@ public class AsyncImageView : View
             Texture2D texture = Resources.Load<Texture2D>(resourcePath);
             if (texture != null)
             {
-                _image.texture = texture;
-                UpdateAspectRatio(texture);
-                TriggerAction(_imagePath);
+                SuccessTrugger(texture);
             }
             else
             {
@@ -134,6 +130,14 @@ public class AsyncImageView : View
             : (texture.width > texture.height
                 ? AspectRatioFitter.AspectMode.WidthControlsHeight
                 : AspectRatioFitter.AspectMode.HeightControlsWidth);
+    }
+
+    private void SuccessTrugger(Texture2D texture) 
+    {
+        _image.texture = texture;
+        UpdateAspectRatio(texture);
+        TriggerAction(_imagePath);
+        _image.color = Color.white;
     }
 
     private void TriggerError() 

@@ -28,8 +28,6 @@ public class InputTextView : View
         if (data != null) 
         {
             inputField.text = data.ToString();
-
-
         }
         base.Init<T>(data);
     }

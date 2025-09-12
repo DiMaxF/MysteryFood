@@ -4,6 +4,8 @@ public class PersonalManager : IDataManager
 {
     private readonly AppData _appData;
 
+    public Currency GetCurrency() => (Currency) _appData.Currency;
+
     public PersonalManager(AppData appData)
     {
         _appData = appData ?? throw new ArgumentNullException(nameof(appData));

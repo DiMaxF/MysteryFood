@@ -338,10 +338,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 27e56e3864487c34e8e1e5b6feb0ceda, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  config: {fileID: 0}
+  config: {fileID: 11400000, guid: 8f8398dcf51a5524987f072ec7b5c5e8, type: 2}
   show: {r: 0.49803925, g: 0.9725491, b: 0.011764707, a: 1}
   hide: {r: 1, g: 1, b: 1, a: 1}
-  _text: {fileID: 0}
+  _text: {fileID: 3987657484543898049}
 --- !u!1001 &3157333475054292803
 PrefabInstance:
   m_ObjectHideFlags: 0

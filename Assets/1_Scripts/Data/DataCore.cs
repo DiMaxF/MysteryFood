@@ -9,6 +9,11 @@ public class DataCore : MonoBehaviour
     [SerializeField] AppData _appData = new AppData();
 
     private EventManager _eventManager;
+    public VenueManager VenueManager 
+    {
+        private set;
+        get;
+    }
     private AnalyticsManager _analyticsManager;
     private PersonalManager _personalManager;
 
@@ -38,6 +43,8 @@ public class DataCore : MonoBehaviour
 
     private void InitializeManagers()
     {
+        VenueManager = new VenueManager(_appData);
+
         _eventManager = new EventManager(_appData);
         _personalManager = new PersonalManager(_appData);
     }

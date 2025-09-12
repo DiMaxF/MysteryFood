@@ -9,13 +9,13 @@ public class GeoPoint
     public string Address;
     public float Latitude;  
     public float Longitude;
-    public GeoPoint(float latitude, float longitude, string address = null)
+    public GeoPoint(float latitude, float longitude, string address)
     {
         Latitude = latitude;
         Longitude = longitude;
         Address = address;
     }
-    public GeoPoint(Vector2 coordinates, string address = null)
+    public GeoPoint(Vector2 coordinates, string address)
     {
         Longitude = coordinates.x;
         Latitude = coordinates.y;

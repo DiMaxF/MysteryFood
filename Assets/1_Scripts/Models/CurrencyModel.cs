@@ -14,6 +14,14 @@ public class CurrencyModel
         { Currency.EGP, 48.5f }  
     };
 
+
+    public CurrencyModel()
+    {
+        Amount = 0;
+        Currency = Currency.USD;
+    }
+
+
     public CurrencyModel(float amount, Currency currency)
     {
         Amount = amount;

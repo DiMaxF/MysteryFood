@@ -9,11 +9,13 @@ public class AppData
 
     public EventModel selectedEvent;
     public List<EventModel> events;
+    public List<VenueModel> Venues;
     public List<MapData> maps;
     public string name;
     public string phone;
     public string email;
     public bool notificationsSales = true;
     public bool notificationsEvents = true;
-    
+    public int Currency;
+
 }

@@ -126,31 +126,7 @@ public class AddEventScreen : AppScreen
 
     private void OnButtonGallery() 
     {
-#if UNITY_WEBGL && !UNITY_EDITOR
-    CrossplatformUtilsManager.PickFile(async (base64Data) =>
-    {
-        if (!string.IsNullOrEmpty(base64Data))
-        {
-            Debug.Log($"Received base64 data: {base64Data.Substring(0, Math.Min(base64Data.Length, 50))}...");
-            var selectedImagePath = await FileManager.SaveImage(base64Data, isBase64: true);  // Await здесь!
-            if (!string.IsNullOrEmpty(selectedImagePath))
-            {
-                UIContainer.InitView(image, selectedImagePath);
-                model.imgPath = selectedImagePath;
-            }
-            else
-            {
-                Debug.LogError("Failed to save image, selectedImagePath is null");
-            }
-        }
-        else
-        {
-            Debug.LogWarning("No file selected or empty base64 data");
-        }
-    }, "image/*");
-#else
-       
-#endif
+        
     }
 
     private void ValidateModel() 
