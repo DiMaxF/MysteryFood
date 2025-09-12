@@ -7,6 +7,7 @@ using UnityEngine.UI;
 public class NavigationButton : View
 {
     [SerializeField] Image icon;
+    [SerializeField] Text label;
     [SerializeField] ButtonView button;
 
     private AppContainer.NavigationButtonData screenData;
@@ -18,6 +19,7 @@ public class NavigationButton : View
         if (data is AppContainer.NavigationButtonData screen)
         {
             screenData = screen;
+
         }
         base.Init(data);    
     }
@@ -37,7 +39,7 @@ public class NavigationButton : View
         if (screenData != null)
         {
             icon.sprite = screenData.icon;
-        
+            label.text = screenData.label;
             AnimateSelected(screenData.selected);
             val = screenData.selected;
         }

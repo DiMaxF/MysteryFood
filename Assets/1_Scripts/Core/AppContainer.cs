@@ -90,6 +90,7 @@ public class AppContainer : MonoBehaviour
     {
         public AppScreen screen;
         public Sprite icon;
+        public string label;
         public bool selected;
     }
 
