@@ -98,7 +98,7 @@ public class PersonalManager : IDataManager
         Logger.Log("Personal data updated", "PersonalManager");
     }
 
-    public void ClearPersonalData()
+    public void Clear()
     {
         _appData.selectedEvent = null;
         _appData.name = null;

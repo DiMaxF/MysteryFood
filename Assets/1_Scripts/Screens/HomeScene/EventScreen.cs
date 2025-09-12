@@ -31,16 +31,7 @@ public class EventScreen : AppScreen
         venue.text = selected.venue;
         desciption.text = selected.description;
         UIContainer.InitView(image, selected.imgPath);
-        var map = Data.Maps.GetByEvent(selected);
-        if (map != null) 
-        {
-            UIContainer.InitView(preview, map.pathPreview);
-        }
-        else
-        {
-            previewBg.color = Color.clear;
-            UIContainer.InitView(preview, "");
-        }
+
     }
 
     protected override void Subscriptions()
@@ -57,7 +48,6 @@ public class EventScreen : AppScreen
     }
     private void OnButtonTicketsDistribution()
     {
-        var mapTickets = Data.Maps.GetByEvent(Data.Personal.GetSelectedEvent());
 
     }
     private void OnButtonBack()

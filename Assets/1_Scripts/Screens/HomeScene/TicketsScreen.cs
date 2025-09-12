@@ -23,7 +23,6 @@ public class TicketsScreen : AppScreen
         }
         else
         {
-            d = Data.Tickets.AllTickets();
         }
         UIContainer.InitView(search, d);
         base.OnStart();

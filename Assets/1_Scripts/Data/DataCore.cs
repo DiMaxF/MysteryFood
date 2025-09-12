@@ -9,15 +9,11 @@ public class DataCore : MonoBehaviour
     [SerializeField] AppData _appData = new AppData();
 
     private EventManager _eventManager;
-    private TicketManager _ticketManager;
-    private MapManager _mapManager;
     private AnalyticsManager _analyticsManager;
     private PersonalManager _personalManager;
 
    
     public EventManager Events => _eventManager;
-    public TicketManager Tickets => _ticketManager;
-    public MapManager Maps => _mapManager;
     public AnalyticsManager Analytics => _analyticsManager;
     public PersonalManager Personal => _personalManager;
 
@@ -43,9 +39,6 @@ public class DataCore : MonoBehaviour
     private void InitializeManagers()
     {
         _eventManager = new EventManager(_appData);
-        _ticketManager = new TicketManager(_appData);
-        _mapManager = new MapManager(_appData);
-        _analyticsManager = new AnalyticsManager(_eventManager, _ticketManager);
         _personalManager = new PersonalManager(_appData);
     }
 

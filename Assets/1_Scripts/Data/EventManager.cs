@@ -48,4 +48,8 @@ public class EventManager : IDataManager
     }
 
     public List<EventModel> GetAll() => _appData.events;
+
+    public void Clear()
+    {
+    }
 }

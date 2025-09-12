@@ -8,35 +8,35 @@ public class AsyncImageView : View
 {
     [SerializeField] private RawImage _image;
     [SerializeField] private GameObject _loading;
+    [SerializeField] private GameObject _placeholder;
     private string _imagePath;
     private AspectRatioFitter aspectRatioFitter;
     public bool widthFill; 
 
     public override void Init<T>(T data)
     {
-        if (data is string path)
-        {
-            _imagePath = path;
-        }
+        if (data is string path) _imagePath = path;
+        InitAspectRatio();
+        base.Init(data);
+    }
 
-        aspectRatioFitter = _image.GetComponent<AspectRatioFitter>();
+    private void InitAspectRatio() 
+    {
         if (aspectRatioFitter == null)
         {
-            aspectRatioFitter = _image.gameObject.AddComponent<AspectRatioFitter>();
+            aspectRatioFitter = _image.GetComponent<AspectRatioFitter>();
+            if (aspectRatioFitter == null) aspectRatioFitter = _image.gameObject.AddComponent<AspectRatioFitter>();
         }
-        UpdateUI();
     }
 
     public override void UpdateUI()
     {
+        Loading(true);
         if (string.IsNullOrEmpty(_imagePath))
         {
-            _image.texture = null;
-            TriggerAction<string>(null);
-            _image.color = Color.clear;
+            TriggerError();
             return;
         }
-        _image.color = Color.white;
         if (_loading != null) _loading.SetActive(true); 
 
         if (IsLocalFilePath(_imagePath))
@@ -79,28 +79,9 @@ public class AsyncImageView : View
     {
         try
         {
-#if UNITY_WEBGL && !UNITY_EDITOR
-        Texture2D texture = await FileManager.LoadImage(path);
-        if (texture != null)
-        {
-            _image.color = Color.white;
-            _image.texture = texture;
-            UpdateAspectRatio(texture);
-            if (_loading != null) _loading.SetActive(false);
-            TriggerAction(path);
-        }
-        else
-        {
-            _image.texture = null;
-            if (_loading != null) _loading.SetActive(false);
-            TriggerAction<string>(null);
-        }
-#else
             if (!File.Exists(path))
             {
-                _image.texture = null;
-                if (_loading != null) _loading.SetActive(false);
-                TriggerAction<string>(null);
+                TriggerError();
                 return;
             }
 
@@ -108,26 +89,17 @@ public class AsyncImageView : View
             Texture2D texture = new Texture2D(2, 2);
             if (texture.LoadImage(imageBytes))
             {
-                _image.color = Color.white;
                 _image.texture = texture;
                 UpdateAspectRatio(texture);
-                if (_loading != null) _loading.SetActive(false);
                 TriggerAction(path);
             }
-            else
-            {
-                _image.texture = null;
-                if (_loading != null) _loading.SetActive(false);
-                TriggerAction<string>(null);
-                Destroy(texture);
-            }
-#endif
+            else TriggerError();
+            Loading(false);
         }
         catch (Exception ex) 
         {
         
         }
-
     }
 
     private void LoadResourcesPath(string path)
@@ -138,18 +110,15 @@ public class AsyncImageView : View
             Texture2D texture = Resources.Load<Texture2D>(resourcePath);
             if (texture != null)
             {
-                _image.color = Color.white;
                 _image.texture = texture;
                 UpdateAspectRatio(texture);
-                if (_loading != null) _loading.SetActive(false);
                 TriggerAction(_imagePath);
             }
             else
             {
-                _image.texture = null;
-                if (_loading != null) _loading.SetActive(false);
-                TriggerAction<string>(null);
+                TriggerError();
             }
+            Loading(false);
         });
     }
 
@@ -165,5 +134,23 @@ public class AsyncImageView : View
             : (texture.width > texture.height
                 ? AspectRatioFitter.AspectMode.WidthControlsHeight
                 : AspectRatioFitter.AspectMode.HeightControlsWidth);
+    }
+
+    private void TriggerError() 
+    {
+        _image.texture = null;
+        TriggerAction<string>(null);
+        _image.color = Color.clear;
+        Placeholder(true);
+    }
+
+    private void Placeholder(bool val = true) 
+    {
+        if(_placeholder != null) _placeholder.SetActive(val);
+    }
+
+    private void Loading(bool val = true) 
+    {
+        if (_loading != null) _loading.SetActive(val);
     }
 }

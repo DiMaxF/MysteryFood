@@ -9,7 +9,7 @@ using UnityEngine;
 using UnityEngine.UI;
 
 public class StatisticsScreen : AppScreen
-{
+{/*
     [SerializeField] ExpandedView kpis;
     [SerializeField] LineChartView visitsChart;
     [SerializeField] ExpandedView sales;
@@ -142,5 +142,5 @@ public class StatisticsScreen : AppScreen
         string filePath = FileManager.GetFilePath(fileName);
 
     }
-
+    */
 }

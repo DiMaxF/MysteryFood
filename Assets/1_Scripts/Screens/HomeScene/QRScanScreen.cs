@@ -36,7 +36,7 @@ public class QRScanScreen : AppScreen
     public void qrScanFinished(string dataText)
     {
 
-        if(dataText != null) 
+        /*if(dataText != null) 
         {
             
             var contacts = new EmailModel(ParseTicketString(dataText).name, ParseTicketString(dataText).email);
@@ -58,7 +58,7 @@ public class QRScanScreen : AppScreen
                 NativeMobilePlugin.Instance.ShowToast("Ticket is used");
 
             }
-        }
+        }*/
     }
     public (string name, string email) ParseTicketString(string ticketString)
     {

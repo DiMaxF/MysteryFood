@@ -4,4 +4,5 @@ using UnityEngine;
 
 public interface IDataManager 
 {
+    void Clear();
 }

@@ -6,6 +6,8 @@ using UnityEngine;
 
 public class AnalyticsManager : IDataManager
 {
+    /*
+
     private readonly EventManager _eventManager;
     private readonly TicketManager _ticketManager;
 
@@ -104,5 +106,10 @@ public class AnalyticsManager : IDataManager
         }
 
         return totalSeats == 0 ? 0f : (float)totalUsedTickets / totalSeats;
+    }
+    */
+    public void Clear()
+    {
+        
     }
 }

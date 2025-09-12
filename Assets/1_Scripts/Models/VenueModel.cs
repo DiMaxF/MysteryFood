@@ -1,18 +1,18 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class VenueModel : MonoBehaviour
+[Serializable]
+public class VenueModel 
 {
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
+    public string Name;
+    public GeoPoint Location;
+    public int Phone;
+    public CurrencyModel Price;
+    public string StartTime;
+    public string EndTime;
+    public string Description;
+    public string IngredientsAllergens;
+    public string ImagePath;
 }
