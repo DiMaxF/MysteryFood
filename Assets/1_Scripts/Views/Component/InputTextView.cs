@@ -5,7 +5,7 @@ using UnityEngine.UI;
 public class InputTextView : View
 {
     [SerializeField] InputField inputField;
-    [SerializeField] Image outline;
+    [SerializeField] Image _status;
     [SerializeField] Color normalColor;
     [SerializeField] Color disableColor = Color.clear;
     [SerializeField] Color errorColor;
@@ -21,7 +21,7 @@ public class InputTextView : View
             inputField.interactable = value;
         }
     }
-    public bool isValid => outline.color != errorColor;
+    public bool isValid => _status.color != errorColor;
 
     public override void Init<T>(T data)
     {
@@ -46,17 +46,17 @@ public class InputTextView : View
 
     public void HighlightError()
     {
-        outline.color = errorColor;
+        _status.color = errorColor;
     }
 
     public void DefaultColor()
     {
-        outline.color = normalColor;
+        _status.color = normalColor;
     }
 
     public void DisableColor() 
     {
-        outline.color = disableColor;
+        _status.color = disableColor;
     }
     public void UpdateColor(Color color)
     {
