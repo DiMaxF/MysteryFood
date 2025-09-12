@@ -24,13 +24,13 @@ public class HomeScreen : AppScreen
         base.Subscriptions();
         UIContainer.SubscribeToView<ButtonView, object>(addReservation, _ => OnButtonAddEvent());
         UIContainer.SubscribeToView<ButtonView, object>(addVenue, _ => OnButtonAddVenue());
-        UIContainer.SubscribeToView<ListView, EventModel>(venues, OnEventsAction);
+        UIContainer.SubscribeToView<ListView, VenueModel>(venues, OnVenueAction);
     }
 
     protected override void UpdateViews()
     {
         base.UpdateViews();
-        UIContainer.InitView(venues, Data.Events.GetAll());
+        UIContainer.InitView(venues, Data.VenueManager.GetAll());
     }
     private void OnButtonAddVenue()
     {
@@ -42,10 +42,10 @@ public class HomeScreen : AppScreen
         Container.Show<AddEventScreen>();
     }
 
-    private void OnEventsAction(EventModel model)
+    private void OnVenueAction(VenueModel model)
     {
-        Data.Personal.SetSelectedEvent(model);
-        Data.SaveData();
-        Container.Show<EventScreen>();
+        var screen = Container.GetScreen<VenueScreen>();
+        screen.SetModel(model);
+        Container.Show(screen);
     }
 }

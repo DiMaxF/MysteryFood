@@ -15,22 +15,22 @@ public class AppContainer : MonoBehaviour
     [SerializeField] List<AppScreen> hideNavigationBar = new List<AppScreen>();
 
     private DataCore core => DataCore.Instance;
-
     private AppScreen _openedScreen;
     public AppScreen OpenedScreen => _openedScreen;
 
+    private Stack<AppScreen> _history = new Stack<AppScreen>();
+
     private void Start()
     {
-        if(navigationBar != null) UIContainer.RegisterView(navigationBar, true);
+        if (navigationBar != null) UIContainer.RegisterView(navigationBar, true);
 
         foreach (var screen in screens) screen.Init(core, this);
 
         if (firstScreen != null) Show(firstScreen);
         else if (screens.Count > 0) Show(screens[0]);
-        
 
-        if (navigationBar != null) 
-            UIContainer.SubscribeToView(navigationBar, (NavigationButtonData data) => 
+        if (navigationBar != null)
+            UIContainer.SubscribeToView(navigationBar, (NavigationButtonData data) =>
             {
                 Show(data.screen);
                 Logger.Log("SHOW", "AppContainer");
@@ -39,6 +39,7 @@ public class AppContainer : MonoBehaviour
 
     public void Show(AppScreen target)
     {
+        if (target == null) return;
         Show(target.name);
     }
 
@@ -51,18 +52,21 @@ public class AppContainer : MonoBehaviour
     private async void Show(string name)
     {
         var targetScreen = FindScreen(name);
-        
+
         if (targetScreen == null || _openedScreen == targetScreen) return;
 
-        foreach (var screen in screens) 
+        if (_openedScreen != null)
         {
-            if (screen == _openedScreen) continue;
-            else screen.gameObject.SetActive(screen.name.Equals(name));
+            _history.Push(_openedScreen);
         }
 
+        foreach (var screen in screens)
+        {
+            if (screen == _openedScreen) continue;
+            screen.gameObject.SetActive(screen.name.Equals(name));
+        }
 
-
-        if(_openedScreen != null) await _openedScreen.Hide();
+        if (_openedScreen != null) await _openedScreen.Hide();
         _openedScreen = targetScreen;
         _openedScreen.OnShow();
 
@@ -75,8 +79,37 @@ public class AppContainer : MonoBehaviour
         }
     }
 
+    public async UniTask Back()
+    {
+        if (_history.Count == 0)
+        {
+            Logger.Log("No screens in history", "AppContainer");
+            return;
+        }
 
-    public AppScreen FindScreen(string name) => 
+        var previousScreen = _history.Pop();
+
+        foreach (var screen in screens)
+        {
+            screen.gameObject.SetActive(screen == previousScreen);
+        }
+
+        if (_openedScreen != null) await _openedScreen.Hide();
+
+        _openedScreen = previousScreen;
+        _openedScreen.OnShow();
+
+        if (navigationBar != null)
+        {
+            if (hideNavigationBar.Contains(_openedScreen)) navigationBar.Hide();
+            else navigationBar.Show();
+
+            UpdateData();
+        }
+
+    }
+
+    public AppScreen FindScreen(string name) =>
         screens.Where(s => s.name == name).FirstOrDefault();
 
     public AScreen GetScreen<AScreen>() where AScreen : AppScreen
@@ -94,14 +127,15 @@ public class AppContainer : MonoBehaviour
         public bool selected;
     }
 
-    private void UpdateData() 
+    private void UpdateData()
     {
         if (navigationBar == null) return;
-        foreach (var data in _data) 
+        foreach (var data in _data)
         {
-            data.selected = data.screen == _openedScreen;   
+            data.selected = data.screen == _openedScreen;
         }
 
         UIContainer.InitView(navigationBar, _data);
     }
+
 }

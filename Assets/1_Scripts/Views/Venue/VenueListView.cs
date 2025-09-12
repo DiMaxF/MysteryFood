@@ -6,6 +6,7 @@ using UnityEngine.UI;
 public class VenueListView : View
 {
     [SerializeField] private AsyncImageView image;
+    [SerializeField] private ButtonView action;
     [SerializeField] private Text address;
     [SerializeField] private Text name;
     [SerializeField] private Text price;
@@ -24,6 +25,12 @@ public class VenueListView : View
         base.Init(data);
     }
 
+    public override void Subscriptions()
+    {
+        base.Subscriptions();
+        UIContainer.SubscribeToView(action, (object _) => TriggerAction(_model));
+    }
+
     public override void UpdateUI()
     {
         base.UpdateUI();
@@ -31,6 +38,8 @@ public class VenueListView : View
         {
             UIContainer.InitView(image, _model.ImagePath);
             price.text = _model.Price.ToString();
+
+            name.text = _model.Name;
         }
     }
 }

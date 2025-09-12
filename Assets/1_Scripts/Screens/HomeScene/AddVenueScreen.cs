@@ -1,3 +1,4 @@
+using Cysharp.Threading.Tasks;
 using System.Collections;
 using System.Collections.Generic;
 using Unity.Android.Gradle;
@@ -26,10 +27,16 @@ public class AddVenueScreen : AppScreen
 
     private VenueModel _model;
 
+    private bool _updateVenue;
+
     protected override void OnStart()
     {
-        _model = new VenueModel();
-        _model.Location = new GeoPoint(GetCoordinates(), "");
+        if (_model == null) 
+        {
+            _model = new VenueModel();
+            _updateVenue = false;
+        }
+        else _updateVenue = true;
         base.OnStart();
     }
 
@@ -37,6 +44,7 @@ public class AddVenueScreen : AppScreen
     {
         base.Subscriptions();
         UIContainer.SubscribeToView<ButtonView, object>(_create, _ => OnButtonCreate());
+        UIContainer.SubscribeToView<ButtonView, object>(_back, _ => OnButtonBack());
         UIContainer.SubscribeToView<ButtonView, object>(_pickImage, _ => OnButtonFilePick());
         UIContainer.SubscribeToView<ButtonView, object>(_repickImage, _ => OnButtonFilePick());
 
@@ -76,6 +84,8 @@ public class AddVenueScreen : AppScreen
             _repickImage.Hide();
         }
     }
+
+    public void SetModel(VenueModel venue) => _model = venue;
 
     #region ViewsActions
 
@@ -126,9 +136,17 @@ public class AddVenueScreen : AppScreen
     {
         if (ValidateModel()) 
         {
-            Data.VenueManager.AddVenue(_model);
+            if (_updateVenue) Data.VenueManager.UpdateVenue(_model);
+            else Data.VenueManager.AddVenue(_model);
+            Data.SaveData();
         }
     }
+
+    private void OnButtonBack()
+    {
+        Container.Back().Forget();
+    }
+
 
     private void OnButtonFilePick() 
     {

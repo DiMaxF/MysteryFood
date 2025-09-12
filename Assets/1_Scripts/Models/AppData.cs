@@ -17,5 +17,5 @@ public class AppData
     public bool notificationsSales = true;
     public bool notificationsEvents = true;
     public int Currency;
-
+    
 }

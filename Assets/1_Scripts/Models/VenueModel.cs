@@ -6,6 +6,7 @@ using UnityEngine;
 [Serializable]
 public class VenueModel 
 {
+    public int Id;
     public string Name;
     public GeoPoint Location;
     public int Phone;
