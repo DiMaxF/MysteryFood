@@ -6,8 +6,12 @@ using UnityEngine.UI;
 
 public class HomeScreen : AppScreen
 {
-    [SerializeField, Space(20)] ListView events;
-    [SerializeField] ButtonView addEvent;
+    [SerializeField] SearchView searchView;
+    [SerializeField] ListView venues;
+    [SerializeField] BaseView hintDistance;
+    [SerializeField] ButtonView addReservation;
+    [SerializeField] ButtonView addVenue;
+    [SerializeField] ButtonView savings;
 
     protected override void OnStart()
     {
@@ -18,14 +22,14 @@ public class HomeScreen : AppScreen
     protected override void Subscriptions()
     {
         base.Subscriptions();
-        UIContainer.SubscribeToView<ButtonView, object>(addEvent, _ => OnButtonAddEvent());
-        UIContainer.SubscribeToView<ListView, EventModel>(events, OnEventsAction);
+        UIContainer.SubscribeToView<ButtonView, object>(addReservation, _ => OnButtonAddEvent());
+        UIContainer.SubscribeToView<ListView, EventModel>(venues, OnEventsAction);
     }
 
     protected override void UpdateViews()
     {
         base.UpdateViews();
-        UIContainer.InitView(events, Data.Events.GetAll());
+        UIContainer.InitView(venues, Data.Events.GetAll());
     }
 
     private void OnButtonAddEvent() 

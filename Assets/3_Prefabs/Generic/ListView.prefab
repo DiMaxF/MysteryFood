@@ -122,12 +122,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d3a57a25f94519547b41df38dbba832f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Clearable: 1
+  persistent: 0
   _contentParent: {fileID: 8653576164823689830}
   _itemPrefab: {fileID: 0}
   noItemPrefab: {fileID: 3089902975823322973, guid: 0495a34be8092654d89ed9a2c787d596, type: 3}
-  spawnAnimationDuration: 0.3
-  spawnStartScale: 0.8
   spawnDelayPerItem: 0.1
 --- !u!1 &511314424219197691
 GameObject:
@@ -176,7 +174,7 @@ GameObject:
   - component: {fileID: 6806312610862817689}
   - component: {fileID: 3369624455843863447}
   - component: {fileID: 1444891892768523060}
-  - component: {fileID: 5999937871080431656}
+  - component: {fileID: 7603421612585420045}
   m_Layer: 5
   m_Name: Viewport
   m_TagString: Untagged
@@ -242,7 +240,7 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
---- !u!114 &5999937871080431656
+--- !u!114 &7603421612585420045
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -251,10 +249,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 1055828021800639442}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 31a19414c41e5ae4aae2af33fee712f6, type: 3}
+  m_Script: {fileID: 11500000, guid: 3312d7739989d2b4e91e6319e9a96d76, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_ShowMaskGraphic: 0
+  m_Padding: {x: 0, y: 0, z: 0, w: 0}
+  m_Softness: {x: 0, y: 0}
 --- !u!1 &1627644212115483340
 GameObject:
   m_ObjectHideFlags: 0
@@ -689,8 +688,8 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 4111238339954044428}
   m_HandleRect: {fileID: 8332814686213966232}
   m_Direction: 2
-  m_Value: 1
-  m_Size: 0.93333334
+  m_Value: 0
+  m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
