@@ -138,6 +138,7 @@ public class AsyncImageView : View
         UpdateAspectRatio(texture);
         TriggerAction(_imagePath);
         _image.color = Color.white;
+        Placeholder(false);
     }
 
     private void TriggerError() 

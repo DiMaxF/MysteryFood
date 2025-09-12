@@ -68,7 +68,7 @@ public class EmailSenderView : View
         string body = UnityWebRequest.EscapeURL("Текст письма");
 
         TriggerAction(emails);
-        NativeMobilePlugin.Instance.OpenEmailMultiple(emails.ConvertAll(e => e.email).ToArray(), subject, body);
+        //NativeMobilePlugin.Instance.OpenEmailMultiple(emails.ConvertAll(e => e.email).ToArray(), subject, body);
     }
 
     private void OnButtonCancel()

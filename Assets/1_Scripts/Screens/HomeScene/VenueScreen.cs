@@ -47,11 +47,17 @@ public class VenueScreen : AppScreen
         base.Subscriptions();
         UIContainer.SubscribeToView(_backButton, (object _)  => OnButtonBack());
         UIContainer.SubscribeToView(_editButton, (object _)  => OnButtonEdit());
+        UIContainer.SubscribeToView(_phone, (object _) => OnButtonDialer());
     }
 
     private void OnButtonBack()
     {
         Container.Back().Forget();
+    }
+
+    private void OnButtonDialer() 
+    {
+        PhoneDialer.OpenDialer(_phone.Text);
     }
 
     private void OnButtonEdit()

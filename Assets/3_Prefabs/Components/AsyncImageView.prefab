@@ -332,7 +332,7 @@ MonoBehaviour:
   _image: {fileID: 2199114817333693574}
   _loading: {fileID: 7486877224526638723}
   _placeholder: {fileID: 1618782458198025873}
-  widthFill: 0
+  widthFill: 1
 --- !u!1 &7486877224526638723
 GameObject:
   m_ObjectHideFlags: 0

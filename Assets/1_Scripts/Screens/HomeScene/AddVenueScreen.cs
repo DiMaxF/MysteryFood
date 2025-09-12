@@ -1,4 +1,5 @@
 using Cysharp.Threading.Tasks;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using Unity.Android.Gradle;
@@ -10,10 +11,17 @@ public class AddVenueScreen : AppScreen
     [SerializeField] private ButtonView _create;
     [SerializeField] private ButtonView _back;
 
+    [Header("Image")]
     [SerializeField] private ButtonView _pickImage;
     [SerializeField] private ButtonView _repickImage;
 
     [SerializeField] private AsyncImageView _image;
+    [Header("Time")]
+    [SerializeField] private TimePickerView _timePicker;
+    [SerializeField] private ButtonView _timeStart;
+    [SerializeField] private InputTextView _timeStartInput;
+    [SerializeField] private ButtonView _timeEnd;
+    [SerializeField] private InputTextView _timeEndInput;
 
     [Header("Inputs")]
     [SerializeField] private InputTextView _name;
@@ -38,6 +46,8 @@ public class AddVenueScreen : AppScreen
         }
         else _updateVenue = true;
         base.OnStart();
+        UIContainer.RegisterView(_timePicker);
+        _timePicker.Hide();
     }
 
     protected override void Subscriptions()
@@ -48,6 +58,9 @@ public class AddVenueScreen : AppScreen
         UIContainer.SubscribeToView<ButtonView, object>(_pickImage, _ => OnButtonFilePick());
         UIContainer.SubscribeToView<ButtonView, object>(_repickImage, _ => OnButtonFilePick());
 
+        UIContainer.SubscribeToView<ButtonView, object>(_timeStart, _ => OnButtonTimeStart());
+        UIContainer.SubscribeToView<ButtonView, object>(_timeEnd, _ => OnButtonTimeEnd());
+
         UIContainer.SubscribeToView<InputTextView, string>(_name, OnNameEdit);
         UIContainer.SubscribeToView<InputTextView, string>(_description, OnNameEdit);
         UIContainer.SubscribeToView<InputTextView, string>(_phone, OnPhoneEdit);
@@ -55,6 +68,8 @@ public class AddVenueScreen : AppScreen
         UIContainer.SubscribeToView<InputTextView, string>(_address, OnAddressEdit);
         UIContainer.SubscribeToView<InputTextView, string>(_description, OnDescriptionEdit);
         UIContainer.SubscribeToView<InputTextView, string>(_ingredientsAllergens, OnIngredientsAllergensEdit);
+
+
 
         UIContainer.SubscribeToView<InputTextView, string>(_lattitude, OnCoordinatesEdit);
         UIContainer.SubscribeToView<InputTextView, string>(_longitude, OnCoordinatesEdit);
@@ -73,6 +88,8 @@ public class AddVenueScreen : AppScreen
         UIContainer.InitView(_description, _model.Description);
         UIContainer.InitView(_ingredientsAllergens, _model.IngredientsAllergens);
 
+        UIContainer.InitView(_timeStartInput, _model.StartTime);
+        UIContainer.InitView(_timeEndInput, _model.EndTime);
         if (_model.ImagePath != "")
         {
             _pickImage.Hide();
@@ -88,6 +105,36 @@ public class AddVenueScreen : AppScreen
     public void SetModel(VenueModel venue) => _model = venue;
 
     #region ViewsActions
+
+    private void OnButtonTimeStart()
+    {
+        UIContainer.UnsubscribeFromView(_timePicker);
+        UIContainer.SubscribeToView<TimePickerView, string>(_timePicker, OnTimeSaveStart);
+        _timePicker.Show();
+        UIContainer.InitView(_timePicker, _model.StartTime);
+    }
+
+    private void OnButtonTimeEnd()
+    {
+        UIContainer.UnsubscribeFromView(_timePicker);
+        UIContainer.SubscribeToView<TimePickerView, string>(_timePicker, OnTimeSaveEnd);
+        _timePicker.Show();
+        UIContainer.InitView(_timePicker, _model.EndTime);
+    }
+
+    private void OnTimeSaveEnd(string time)
+    {
+        if (TimeSpan.TryParse(time, out var t)) _model.EndTime = time;
+        _timePicker.Hide();
+        UpdateViews();
+    }
+
+    private void OnTimeSaveStart(string time)
+    {
+        if (TimeSpan.TryParse(time, out var t)) _model.StartTime = time;
+        _timePicker.Hide();
+        UpdateViews();
+    }
 
     private void OnPhoneEdit(string val)
     {
@@ -194,7 +241,7 @@ public class AddVenueScreen : AppScreen
         {
             return InputError(_address);
         }
-        if (_phone.text == "")
+        if (_phone.text == "" || _phone.text.Length < 11)
         {
             return InputError(_phone);
         }
