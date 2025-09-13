@@ -13,7 +13,7 @@ public class QrReservationScreen : AppScreen
     [SerializeField] private ReservationShortView _reservationInfo;
 
     private ReservationModel _model;
-    public void Setmodel(ReservationModel model) => _model = model;
+    public void SetModel(ReservationModel model) => _model = model;
 
     protected override void UpdateViews()
     {

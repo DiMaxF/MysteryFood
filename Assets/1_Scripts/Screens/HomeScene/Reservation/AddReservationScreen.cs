@@ -187,6 +187,11 @@ public class AddReservationScreen : AppScreen
         _model.QrPath = qrPath;
         Data.ReservationManager.Add(_model);
         Data.SaveData();
+
+
+        var screen = Container.GetScreen<QrReservationScreen>();
+        screen.SetModel(_model);
+        Container.Show(screen);
     }
 
     private void OnButtonConfirm()
