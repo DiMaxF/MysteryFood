@@ -186,6 +186,7 @@ public class AddReservationScreen : AppScreen
         _model.CreatedAt = DateTime.Now.ToString(DateTimeUtils.Full);
         _model.QrPath = qrPath;
         Data.ReservationManager.Add(_model);
+        Data.SaveData();
     }
 
     private void OnButtonConfirm()

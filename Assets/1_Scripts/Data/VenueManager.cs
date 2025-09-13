@@ -40,13 +40,9 @@ public class VenueManager : IDataManager
             Debug.LogError("Updated venue is null");
             return false;
         }
+        var existingVenue = GetById(updatedVenue.Id);
 
-        var existingVenue = _appData.Venues.FirstOrDefault(v => v.Id == updatedVenue.Id);
-        if (existingVenue == null)
-        {
-            Debug.LogWarning($"Venue with Id {updatedVenue.Id} not found");
-            return false;
-        }
+        if (existingVenue == null) return false;
 
         existingVenue.Name = updatedVenue.Name;
         existingVenue.Location = updatedVenue.Location;
@@ -60,5 +56,16 @@ public class VenueManager : IDataManager
 
         Debug.Log($"Venue with Id {updatedVenue.Id} updated successfully");
         return true;
+    }
+
+    public VenueModel GetById(int id) 
+    {
+        var existingVenue = _appData.Venues.FirstOrDefault(v => v.Id == id);
+        if (existingVenue == null)
+        {
+            Debug.LogWarning($"Venue with Id {id} not found");
+            return null;
+        }
+        return existingVenue;
     }
 }

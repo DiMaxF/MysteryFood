@@ -16,6 +16,7 @@ public class ReservationModel
     public bool Notification;
     public StatusReservation Status;
     public string CreatedAt;
+    public string EndAt;
 
     public ReservationModel()
     {

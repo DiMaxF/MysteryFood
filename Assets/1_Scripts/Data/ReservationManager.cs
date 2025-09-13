@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class ReservationManager : IDataManager
@@ -26,5 +27,39 @@ public class ReservationManager : IDataManager
         model.Id = _index;
         _index++;
         _appData.Reservations.Add(model);
+    }
+
+    public bool Update(ReservationModel updated)
+    {
+        if (updated == null)
+        {
+            Debug.LogError("Updated venue is null");
+            return false;
+        }
+        var existing = GetById(updated.Id);
+
+        if (existing == null) return false;
+
+        existing.OriginalPrice = updated.OriginalPrice;
+        existing.DiscountedPrice = updated.DiscountedPrice;
+        existing.StartTime = updated.StartTime;
+        existing.EndTime = updated.EndTime;
+        existing.Notes = updated.Notes;
+        existing.QrPath = updated.QrPath;
+        existing.Notification = updated.Notification;
+        existing.Status = updated.Status;
+
+        Logger.Log($"Reservation with Id {updated.Id} updated successfully", "ReservationManager");
+        return true;
+    }
+    public ReservationModel GetById(int id)
+    {
+        var existing = _appData.Reservations.FirstOrDefault(v => v.Id == id);
+        if (existing == null)
+        {
+            Logger.LogWarning($"Venue with Id {id} not found", "ReservationManager");
+            return null;
+        }
+        return existing;
     }
 }
