@@ -29,6 +29,17 @@ public class ReservationManager : IDataManager
         _appData.Reservations.Add(model);
     }
 
+    public List<ReservationModel> GetSorted(StatusReservation status) 
+    {
+        return GetAll().Where(r => r.Status == status).ToList();
+    }
+
+    public List<ReservationModel> GetAll() 
+    {
+        return _appData.Reservations;
+    }
+
+
     public bool Update(ReservationModel updated)
     {
         if (updated == null)
@@ -52,6 +63,7 @@ public class ReservationManager : IDataManager
         Logger.Log($"Reservation with Id {updated.Id} updated successfully", "ReservationManager");
         return true;
     }
+
     public ReservationModel GetById(int id)
     {
         var existing = _appData.Reservations.FirstOrDefault(v => v.Id == id);
