@@ -51,11 +51,15 @@ public class OrdersScreen : AppScreen
     {
         if (action.Item1 == "Open")
         {
-
+            var screen = Container.GetScreen<QrReservationScreen>();
+            screen.SetModel(action.Item2);
+            Container.Show(screen);
         }
         else //cancel
         {
-        
+            action.Item2.Status = StatusReservation.Cancelled;
+            Data.ReservationManager.Update(action.Item2);
+            Data.SaveData();
         }
     }
 }
