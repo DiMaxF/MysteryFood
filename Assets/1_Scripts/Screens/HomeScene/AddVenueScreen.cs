@@ -127,6 +127,7 @@ public class AddVenueScreen : AppScreen
         if (TimeSpan.TryParse(time, out var t)) _model.EndTime = time;
         _timePicker.Hide();
         UpdateViews();
+        ValidateModel();
     }
 
     private void OnTimeSaveStart(string time)
@@ -134,6 +135,7 @@ public class AddVenueScreen : AppScreen
         if (TimeSpan.TryParse(time, out var t)) _model.StartTime = time;
         _timePicker.Hide();
         UpdateViews();
+        ValidateModel();
     }
 
     private void OnPhoneEdit(string val)
@@ -245,7 +247,20 @@ public class AddVenueScreen : AppScreen
         {
             return InputError(_phone);
         }
+        if (_timeStartInput.text == "" || !TimeSpan.TryParse(_timeStartInput.text, out var startTime))
+        {
+            return InputError(_timeStartInput);
+        }
+        if (_timeEndInput.text == "" || !TimeSpan.TryParse(_timeStartInput.text, out var endTime))
+        {
+            return InputError(_timeEndInput);
+        }
 
+        if (startTime > endTime)
+        {
+            InputError(_timeStartInput);
+            return InputError(_timeEndInput);
+        }
         _create.interactable = true;
         return true;
     }

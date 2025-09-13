@@ -14,6 +14,11 @@ public class DataCore : MonoBehaviour
         private set;
         get;
     }
+    public ReservationManager ReservationManager
+    {
+        private set;
+        get;
+    }
     private AnalyticsManager _analyticsManager;
     private PersonalManager _personalManager;
 
@@ -44,6 +49,7 @@ public class DataCore : MonoBehaviour
     private void InitializeManagers()
     {
         VenueManager = new VenueManager(_appData);
+        ReservationManager = new ReservationManager(_appData);
 
         _eventManager = new EventManager(_appData);
         _personalManager = new PersonalManager(_appData);
@@ -64,7 +70,7 @@ public class DataCore : MonoBehaviour
     public void SaveData()
     {
         string json = JsonUtility.ToJson(_appData, true);
-        FileManager.WriteToFile(AppDataFileName, json);
+        FileManager.WriteToFile(AppDataFileName, json).Forget();
         Logger.Log("GlobalData saved successfully");
     }
     private void LoadData()

@@ -48,6 +48,8 @@ public class VenueScreen : AppScreen
         UIContainer.SubscribeToView(_backButton, (object _)  => OnButtonBack());
         UIContainer.SubscribeToView(_editButton, (object _)  => OnButtonEdit());
         UIContainer.SubscribeToView(_phone, (object _) => OnButtonDialer());
+
+        UIContainer.SubscribeToView(_reserveForPickup, (object _) => OnButtonReserveForPickup());
     }
 
     private void OnButtonBack()
@@ -64,6 +66,13 @@ public class VenueScreen : AppScreen
     {
         var screen = Container.GetScreen<AddVenueScreen>();
         screen.SetModel(_model);
+        Container.Show(screen);
+    }
+
+    private void OnButtonReserveForPickup() 
+    {
+        var screen = Container.GetScreen<AddReservationScreen>();
+        screen.SetVenue(_model);
         Container.Show(screen);
     }
 

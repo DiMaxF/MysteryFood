@@ -10,6 +10,7 @@ public class ButtonView : View
     private Button _button;
     private string _textButton;
     public RectTransform rect { private set; get; }
+    public CanvasGroup canvasGroup{ private set; get; }
     public Image image => _button.image;
     public string Text => _text.text;
     public bool interactable
@@ -21,7 +22,9 @@ public class ButtonView : View
     private void Awake()
     {
         _button = GetComponent<Button>();
-        rect = GetComponent<RectTransform>();   
+        rect = GetComponent<RectTransform>();
+        canvasGroup = GetComponent<CanvasGroup>();  
+        if(canvasGroup == null) canvasGroup = gameObject.AddComponent<CanvasGroup>();
         _button.onClick.AddListener(() => TriggerAction(_textButton)); 
     }
 
