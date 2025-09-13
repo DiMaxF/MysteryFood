@@ -38,7 +38,9 @@ public class QrReservationScreen : AppScreen
 
     private void OnButtonFullInfo() 
     {
-    
+        var screen = Container.GetScreen<OrderDetailsScreen>();
+        screen.SetModel(_model);
+        Container.Show(screen);
     }
 
     private void OnButtonMarked()
