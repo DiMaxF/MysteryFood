@@ -15,7 +15,6 @@ public class NotificationsScreen : AppScreen
         base.OnStart();
         //ui.InitView(masterToggle, core.Notification);
         UIContainer.SubscribeToView<ToggleView, bool>(masterToggle, OnMasterToggle); 
-        UIContainer.SubscribeToView<ListView, EventModel>(notificationsList, OnListAction);
         UIContainer.SubscribeToView<ButtonView, object>(save, _ => Save());
         UIContainer.SubscribeToView<ButtonView, object>(back, _ => Back());
         //UpdateNotifications().Forget();
@@ -33,11 +32,6 @@ public class NotificationsScreen : AppScreen
     private void OnMasterToggle(bool value)
     {
         //core.Notification = value;
-    }
-
-    private void OnListAction(EventModel model)
-    {
-        
     }
 
 

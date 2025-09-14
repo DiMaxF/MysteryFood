@@ -9,7 +9,7 @@ public class SearchView : View
     [SerializeField] private InputTextView inputTextView;
     [SerializeField] private ButtonView searchButton;
 
-    private List<TicketModel> _dataSource = new List<TicketModel>();
+    /*private List<TicketModel> _dataSource = new List<TicketModel>();
     private List<TicketModel> _lastSearchResults = new List<TicketModel>();
     private Func<TicketModel, string, bool> _matchCriteria;
     private Func<TicketModel, string> _displayFormatter;
@@ -107,5 +107,5 @@ public class SearchView : View
         if (eventModel == null) return ticket.contacts?.name ?? "Unknown Ticket";
 
         return $"{eventModel.name} - {eventModel.date} {eventModel.time} - {ticket.contacts?.name}";
-    }
+    }*/
 }

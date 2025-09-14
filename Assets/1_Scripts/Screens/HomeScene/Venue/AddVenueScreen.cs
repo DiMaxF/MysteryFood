@@ -10,6 +10,7 @@ public class AddVenueScreen : AppScreen
 {
     [SerializeField] private ButtonView _create;
     [SerializeField] private ButtonView _back;
+    [SerializeField] private ToastView _toast;
 
     [Header("Image")]
     [SerializeField] private ButtonView _pickImage;
@@ -47,7 +48,9 @@ public class AddVenueScreen : AppScreen
         else _updateVenue = true;
         base.OnStart();
         UIContainer.RegisterView(_timePicker);
+        UIContainer.RegisterView(_toast);
         _timePicker.Hide();
+        _toast.Hide();
     }
 
     protected override void Subscriptions()
@@ -147,7 +150,7 @@ public class AddVenueScreen : AppScreen
     private void OnPriceEdit(string val)
     {
         if (!int.TryParse(val, out var price)) return;
-        _model.Price = new CurrencyModel(price, Data.Personal.GetCurrency());
+        _model.Price = new CurrencyModel(price, Data.PersonalManager.GetCurrency);
         ValidateModel();
     }
     private void OnDescriptionEdit(string val)
@@ -183,12 +186,18 @@ public class AddVenueScreen : AppScreen
 
     private void OnButtonCreate()
     {
-        if (ValidateModel()) 
+        if (ValidateModel())
         {
             if (_updateVenue) Data.VenueManager.UpdateVenue(_model);
             else Data.VenueManager.AddVenue(_model);
             Data.SaveData();
+            UIContainer.InitView(_toast, "Venue successfully added");
         }
+        else 
+        {
+            UIContainer.InitView(_toast, "Fill in all fields correctly");
+        }
+        _toast.Show();
     }
 
     private void OnButtonBack()
@@ -243,7 +252,7 @@ public class AddVenueScreen : AppScreen
         {
             return InputError(_address);
         }
-        if (_phone.text == "" || _phone.text.Length < 11)
+        if (_phone.text == "" || _phone.text.Length < 7)
         {
             return InputError(_phone);
         }
@@ -251,7 +260,7 @@ public class AddVenueScreen : AppScreen
         {
             return InputError(_timeStartInput);
         }
-        if (_timeEndInput.text == "" || !TimeSpan.TryParse(_timeStartInput.text, out var endTime))
+        if (_timeEndInput.text == "" || !TimeSpan.TryParse(_timeEndInput.text, out var endTime))
         {
             return InputError(_timeEndInput);
         }

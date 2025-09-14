@@ -8,7 +8,6 @@ public class DataCore : MonoBehaviour
 
     [SerializeField] AppData _appData = new AppData();
 
-    private EventManager _eventManager;
     public VenueManager VenueManager 
     {
         private set;
@@ -19,15 +18,19 @@ public class DataCore : MonoBehaviour
         private set;
         get;
     }
+    public PersonalManager PersonalManager
+    {
+        private set;
+        get;
+    }
+
     private AnalyticsManager _analyticsManager;
-    private PersonalManager _personalManager;
 
    
-    public EventManager Events => _eventManager;
     public AnalyticsManager Analytics => _analyticsManager;
-    public PersonalManager Personal => _personalManager;
 
-    private const string AppDataFileName = "appData.json";
+
+    private const string AppDataFileName = "data.json";
 
     private void Awake()
     {
@@ -50,9 +53,7 @@ public class DataCore : MonoBehaviour
     {
         VenueManager = new VenueManager(_appData);
         ReservationManager = new ReservationManager(_appData);
-
-        _eventManager = new EventManager(_appData);
-        _personalManager = new PersonalManager(_appData);
+        PersonalManager = new PersonalManager(_appData);
     }
 
 
