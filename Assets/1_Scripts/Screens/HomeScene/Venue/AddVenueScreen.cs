@@ -38,6 +38,8 @@ public class AddVenueScreen : AppScreen
 
     private bool _updateVenue;
 
+    public void SetModel(VenueModel venue) => _model = venue;
+
     protected override void OnStart()
     {
         if (_model == null) 
@@ -105,7 +107,6 @@ public class AddVenueScreen : AppScreen
         }
     }
 
-    public void SetModel(VenueModel venue) => _model = venue;
 
     #region ViewsActions
 
@@ -192,6 +193,7 @@ public class AddVenueScreen : AppScreen
             else Data.VenueManager.AddVenue(_model);
             Data.SaveData();
             UIContainer.InitView(_toast, "Venue successfully added");
+            Container.Show<HomeScreen>();
         }
         else 
         {
@@ -244,6 +246,8 @@ public class AddVenueScreen : AppScreen
         _name.DefaultColor();
         _address.DefaultColor();
         _phone.DefaultColor();
+        _timeEndInput.DefaultColor();
+        _timeStartInput.DefaultColor();
         if (_name.text == "") 
         {
             return InputError(_name);
@@ -267,6 +271,7 @@ public class AddVenueScreen : AppScreen
 
         if (startTime > endTime)
         {
+            //Logger.Log($"{startTime} - {endTime}: {startTime > endTime}", "AddVenueScreen");
             InputError(_timeStartInput);
             return InputError(_timeEndInput);
         }

@@ -10,7 +10,7 @@ public class InputTextView : View
     [SerializeField] Color disableColor = Color.clear;
     [SerializeField] Color errorColor;
 
-    public string text => inputField != null ? inputField.text : "";
+    public string text => inputField != null ? inputField.textComponent.text : "";
     public bool interactable
     {
         get => inputField.interactable;

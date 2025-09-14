@@ -30,7 +30,7 @@ public class DataCore : MonoBehaviour
     public AnalyticsManager Analytics => _analyticsManager;
 
 
-    private const string AppDataFileName = "data.json";
+    private const string AppDataFileName = "gfgfgfg.json";
 
     private void Awake()
     {
