@@ -1,8 +1,9 @@
+using Cysharp.Threading.Tasks;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
-using Cysharp.Threading.Tasks;
+using UnityEngine.WSA;
 
 public class VenueScreen : AppScreen
 {
@@ -19,12 +20,21 @@ public class VenueScreen : AppScreen
     [SerializeField] private Text _price;
     [SerializeField] private ButtonView _viewOnMap;
     [SerializeField] private ButtonView _reserveForPickup;
-
+    [Header("Overlay")]
+    [SerializeField] private ConfirmPanel _confirmPanel;
+    [SerializeField] private EnterCoordinatesView _enterCoordinates;
+    [SerializeField] private ToastView _toast;
     private VenueModel _model;
 
     protected override void OnStart()
     {
         base.OnStart();
+        UIContainer.RegisterView(_confirmPanel);
+        UIContainer.RegisterView(_enterCoordinates);
+        UIContainer.RegisterView(_toast);
+        _enterCoordinates.Hide();
+        _confirmPanel.Hide();
+        _toast.Hide();
     }
 
     protected override void UpdateViews()
@@ -46,8 +56,11 @@ public class VenueScreen : AppScreen
     {
         base.Subscriptions();
         UIContainer.SubscribeToView(_backButton, (object _)  => OnButtonBack());
+        UIContainer.SubscribeToView(_viewOnMap, (object _)  => OnButtonViewOnMap());
         UIContainer.SubscribeToView(_editButton, (object _)  => OnButtonEdit());
         UIContainer.SubscribeToView(_phone, (object _) => OnButtonDialer());
+        UIContainer.SubscribeToView<ConfirmPanel, bool>(_confirmPanel, OnConfirmPanelResult);
+        UIContainer.SubscribeToView<EnterCoordinatesView, GeoPoint>(_enterCoordinates, EnterCoordinates);
 
         UIContainer.SubscribeToView(_reserveForPickup, (object _) => OnButtonReserveForPickup());
     }
@@ -74,6 +87,45 @@ public class VenueScreen : AppScreen
         var screen = Container.GetScreen<AddReservationScreen>();
         screen.SetVenue(_model);
         Container.Show(screen);
+    }
+
+
+    private void OnButtonViewOnMap() 
+    {
+        if (_model.Location.Latitude == 0)
+        {
+            _confirmPanel.Show();
+            UIContainer.InitView(_confirmPanel, "No coordinates set for this venue. Add now?");
+        }
+        else 
+        {
+            var screen = Container.GetScreen<MapScreen>();  
+            Container.Show(screen);
+        }
+    }
+
+    private void OnConfirmPanelResult(bool val) 
+    {
+        if (val)
+        {
+            UIContainer.InitView(_enterCoordinates, _model.Location);    
+            _enterCoordinates.Show();
+        }
+        _confirmPanel.Hide();
+    }
+
+    private void EnterCoordinates(GeoPoint geo) 
+    {
+        if (geo.Longitude != 0) 
+        {
+            _model.Location.Latitude = geo.Latitude;
+            _model.Location.Longitude = geo.Longitude;
+            Data.VenueManager.UpdateVenue(_model);
+            Data.SaveData();
+            _toast.Show();
+            UIContainer.InitView(_toast, "Coordinates successfully saved");
+        }
+        _enterCoordinates.Hide();
     }
 
     public void SetModel(VenueModel venue) => _model = venue;

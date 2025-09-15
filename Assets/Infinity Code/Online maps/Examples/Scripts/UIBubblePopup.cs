@@ -145,7 +145,7 @@ namespace InfinityCode.OnlineMapsDemos
         private void UpdateBubblePosition()
         {
             // If no marker is selected then exit.
-            if (targetMarker == null) return;
+            /*if (targetMarker == null) return;
 
             // Hide the popup if the marker is outside the map view
             if (!targetMarker.inMapView)
@@ -165,7 +165,7 @@ namespace InfinityCode.OnlineMapsDemos
             RectTransformUtility.ScreenPointToLocalPointInRectangle(canvas.transform as RectTransform, screenPosition, null, out point);
 
             // Set local position of the popup
-            (bubble.transform as RectTransform).localPosition = point;
+            (bubble.transform as RectTransform).localPosition = point;*/
         }
 
         [Serializable]

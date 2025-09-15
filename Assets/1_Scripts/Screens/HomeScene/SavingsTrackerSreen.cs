@@ -16,4 +16,14 @@ public class SavingsTrackerSreen : AppScreen
     [SerializeField] private RowChartView _monthlySavings;
     [SerializeField] private LineChartView _bagsOverTime;
     [SerializeField] private ListView _recentActivity;
+
+    protected override void UpdateViews()
+    {
+        base.UpdateViews();
+    }
+
+    protected override void Subscriptions()
+    {
+        base.Subscriptions();
+    }
 }

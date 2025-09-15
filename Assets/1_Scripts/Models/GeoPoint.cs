@@ -9,6 +9,13 @@ public class GeoPoint
     public string Address;
     public float Latitude;  
     public float Longitude;
+
+    public GeoPoint()
+    {
+        Latitude = 0;
+        Longitude = 0;
+        Address = "";
+    }
     public GeoPoint(float latitude, float longitude, string address)
     {
         Latitude = latitude;

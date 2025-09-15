@@ -24,6 +24,10 @@ public class VenueManager : IDataManager
 
     }
 
+    public List<VenueModel> GetVenuesWithCoordinates() 
+    {
+        return GetAll().Where(v => v.Location.Longitude != 0).ToList();
+    }
     public List<VenueModel> GetAll() => _appData.Venues;
 
     public void AddVenue(VenueModel venue) 
