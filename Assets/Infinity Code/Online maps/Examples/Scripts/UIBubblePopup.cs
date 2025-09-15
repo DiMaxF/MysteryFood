@@ -24,39 +24,24 @@ namespace InfinityCode.OnlineMapsDemos
         public GameObject bubble;
 
         /// <summary>
-        /// Title text
+        /// VenueListView component for displaying venue data
         /// </summary>
-        public Text title;
+        public VenueListView venueListView;
 
         /// <summary>
-        /// Address text
+        /// Array of VenueModel data
         /// </summary>
-        public Text address;
+        public VenueModel[] venues;
 
         /// <summary>
-        /// Photo RawImage
+        /// Action to invoke when a venue is selected
         /// </summary>
-        public RawImage photo;
-
-        public CData[] datas;
+        public Action<VenueModel> OnVenueSelected;
 
         /// <summary>
         /// Reference to active marker
         /// </summary>
         private OnlineMapsMarker targetMarker;
-
-        /// <summary>
-        /// This method is called when downloading photo texture.
-        /// </summary>
-        /// <param name="texture2D">Photo texture</param>
-        private void OnDownloadPhotoComplete(OnlineMapsWWW www)
-        {
-            Texture2D texture = new Texture2D(1, 1);
-            www.LoadImageIntoTexture(texture);
-
-            // Set place texture to bubble popup
-            photo.texture = texture;
-        }
 
         /// <summary>
         /// This method is called by clicking on the map
@@ -80,27 +65,19 @@ namespace InfinityCode.OnlineMapsDemos
             targetMarker = marker as OnlineMapsMarker;
 
             // Get a result item from instance of the marker
-            CData data = marker["data"] as CData;
-            if (data == null) return;
+            VenueModel venue = marker["data"] as VenueModel;
+            if (venue == null) return;
 
             // Show the popup
             bubble.SetActive(true);
 
-            // Set title and address
-            title.text = data.title;
-            address.text = data.address;
+            // Initialize VenueListView with the venue data
+            venueListView.Init(venue);
 
-            // Destroy the previous photo
-            if (photo.texture != null)
-            {
-                OnlineMapsUtils.Destroy(photo.texture);
-                photo.texture = null;
-            }
+            // Invoke the OnVenueSelected action with the selected venue
+            OnVenueSelected?.Invoke(venue);
 
-            OnlineMapsWWW www = new OnlineMapsWWW(data.photo_url);
-            www.OnComplete += OnDownloadPhotoComplete;
-
-            // Initial update position
+            // Update popup position
             UpdateBubblePosition();
         }
 
@@ -124,18 +101,17 @@ namespace InfinityCode.OnlineMapsDemos
                 OnlineMapsCameraOrbit.instance.OnCameraControl += UpdateBubblePosition;
             }
 
-            if (datas != null)
+            if (venues != null)
             {
-                foreach (CData data in datas)
+                foreach (VenueModel venue in venues)
                 {
-                    OnlineMapsMarker marker = OnlineMapsMarkerManager.CreateItem(data.longitude, data.latitude);
-                    marker["data"] = data;
+                    OnlineMapsMarker marker = OnlineMapsMarkerManager.CreateItem(venue.Location.Longitude, venue.Location.Latitude);
+                    marker["data"] = venue;
                     marker.OnClick += OnMarkerClick;
                 }
             }
 
-
-            // Initial hide popup
+            // Initially hide popup
             bubble.SetActive(false);
         }
 
@@ -144,7 +120,6 @@ namespace InfinityCode.OnlineMapsDemos
         /// </summary>
         private void UpdateBubblePosition()
         {
-            // If no marker is selected then exit.
             /*if (targetMarker == null) return;
 
             // Hide the popup if the marker is outside the map view
@@ -152,30 +127,23 @@ namespace InfinityCode.OnlineMapsDemos
             {
                 if (bubble.activeSelf) bubble.SetActive(false);
             }
-            else if (!bubble.activeSelf) bubble.SetActive(true);
+            else if (!bubble.activeSelf)
+            {
+                bubble.SetActive(true);
+            }
 
-            // Convert the coordinates of the marker to the screen position.
+            // Convert the coordinates of the marker to the screen position
             Vector2 screenPosition = OnlineMapsControlBase.instance.GetScreenPosition(targetMarker.position);
 
             // Add marker height
             screenPosition.y += targetMarker.height;
 
-            // Get a local position inside the canvas.
+            // Get a local position inside the canvas
             Vector2 point;
             RectTransformUtility.ScreenPointToLocalPointInRectangle(canvas.transform as RectTransform, screenPosition, null, out point);
 
             // Set local position of the popup
             (bubble.transform as RectTransform).localPosition = point;*/
-        }
-
-        [Serializable]
-        public class CData
-        {
-            public string title;
-            public string address;
-            public string photo_url;
-            public double longitude;
-            public double latitude;
         }
     }
 }

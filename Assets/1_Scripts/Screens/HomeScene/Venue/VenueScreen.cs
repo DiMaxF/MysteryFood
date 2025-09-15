@@ -100,6 +100,7 @@ public class VenueScreen : AppScreen
         else 
         {
             var screen = Container.GetScreen<MapScreen>();  
+            screen.GoToPoint(_model.Location);
             Container.Show(screen);
         }
     }
@@ -122,8 +123,9 @@ public class VenueScreen : AppScreen
             _model.Location.Longitude = geo.Longitude;
             Data.VenueManager.UpdateVenue(_model);
             Data.SaveData();
-            _toast.Show();
             UIContainer.InitView(_toast, "Coordinates successfully saved");
+
+            _toast.Show();
         }
         _enterCoordinates.Hide();
     }

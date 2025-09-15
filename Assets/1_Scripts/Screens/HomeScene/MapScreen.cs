@@ -17,14 +17,16 @@ public class MapScreen : AppScreen
         _canvasPopup.gameObject.SetActive(true);
     }
 
-    private void InitPoints() 
+    public void GoToPoint(GeoPoint point)
+    {
+        _map.SetPosition(point.Longitude, point.Latitude);
+        _map.zoom = 18;
+    }
+
+    private void InitPoints()
     {
         var allVenues = Data.VenueManager.GetVenuesWithCoordinates();
-        _bubbles.datas = new UIBubblePopup.CData[allVenues.Count];
-        for (var i = 0; i < _bubbles.datas.Length; i++)
-        {
-            _bubbles.datas[i] = ConverToOnlineMaps(allVenues[i]);
-        }
+        _bubbles.venues = allVenues.ToArray();
     }
 
     private void OnDisable()
@@ -33,13 +35,4 @@ public class MapScreen : AppScreen
         _canvasPopup.gameObject.SetActive(false);
     }
 
-    private UIBubblePopup.CData ConverToOnlineMaps(VenueModel venue) 
-    {
-        var data = new UIBubblePopup.CData();   
-        data.title = venue.Name;
-        data.address = venue.Location.Address;
-        data.latitude = venue.Location.Latitude;
-        data.longitude = venue.Location.Longitude;
-        return data;
-    }
 }
