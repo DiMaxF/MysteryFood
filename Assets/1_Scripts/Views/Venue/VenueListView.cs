@@ -38,7 +38,7 @@ public class VenueListView : View
         {
             UIContainer.InitView(image, _model.ImagePath);
             price.text = _model.Price.ToString();
-
+            pickupToday.text = $"{_model.StartTime}-{_model.EndTime}";
             name.text = _model.Name;
         }
     }

@@ -65,8 +65,13 @@ public class HomeScreen : AppScreen
         _selectVenue.Hide();
     }
 
-    private void OnVenueAction(VenueModel model)
+    private void OnVenueAction(object obj)
     {
+        if (!(obj is VenueModel model)) 
+        {
+            OnButtonAddVenue();
+            return;
+        }
         var screen = Container.GetScreen<VenueScreen>();
         screen.SetModel(model);
         Container.Show(screen);

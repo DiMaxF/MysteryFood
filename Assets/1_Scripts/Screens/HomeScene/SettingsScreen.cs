@@ -24,7 +24,8 @@ public class SettingsScreen : AppScreen
 
     [Header("Data")]
     [SerializeField] private ButtonView _clearAllData;
-
+    [Header("Overlay")] 
+    [SerializeField] private ConfirmPanel _confirmPanel;
 
     private Currency _selectedCurrency => Data.PersonalManager.GetCurrency;
     private int _selectedNotification => Data.PersonalManager.Notification;
@@ -72,6 +73,10 @@ public class SettingsScreen : AppScreen
         UIContainer.InitView(_egp, _selectedCurrency == Currency.EGP);
         UIContainer.InitView(_eur, _selectedCurrency == Currency.EUR);
         UIContainer.InitView(_usd, _selectedCurrency == Currency.USD);
+
+        Data.ReservationManager.UpdateCurrency(_selectedCurrency);
+        Data.VenueManager.UpdateCurrency(_selectedCurrency);
+        Data.SaveData();
     }
 
     private void SetNotification(int min)

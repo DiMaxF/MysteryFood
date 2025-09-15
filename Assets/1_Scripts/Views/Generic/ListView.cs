@@ -39,7 +39,13 @@ public class ListView : View
 
         foreach (var item in _dataSource) SpawnView(item);
 
-        if (_items.Count == 0) Instantiate(noItemPrefab, _contentParent, false);
+        if (_items.Count == 0) 
+        {
+            var view = Instantiate(noItemPrefab, _contentParent);
+            UIContainer.RegisterView(view);
+            _items.Add(view);
+            UIContainer.SubscribeToView(view, (object data) => TriggerAction(data));
+        }
 
         _isUpdating = false;
 

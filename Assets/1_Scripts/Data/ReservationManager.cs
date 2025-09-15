@@ -74,4 +74,15 @@ public class ReservationManager : IDataManager
         }
         return existing;
     }
+
+    public void UpdateCurrency(Currency currency) 
+    {
+        foreach (var r in GetAll()) 
+        {
+            r.DiscountedPrice.Amount = r.DiscountedPrice.ConvertTo(currency);
+            r.DiscountedPrice.Currency = currency;
+            r.OriginalPrice.Amount = r.OriginalPrice.ConvertTo(currency);
+            r.OriginalPrice.Currency = currency;
+        }
+    }
 }

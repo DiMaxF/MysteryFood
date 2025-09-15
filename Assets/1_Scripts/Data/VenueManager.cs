@@ -72,4 +72,14 @@ public class VenueManager : IDataManager
         }
         return existingVenue;
     }
+
+
+    public void UpdateCurrency(Currency currency)
+    {
+        foreach (var r in GetAll())
+        {
+            r.Price.Amount = r.Price.ConvertTo(currency);
+            r.Price.Currency = currency;
+        }
+    }
 }
