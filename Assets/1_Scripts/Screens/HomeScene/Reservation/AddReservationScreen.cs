@@ -61,7 +61,7 @@ public class AddReservationScreen : AppScreen
 
         if (Data.PersonalManager.PermissionLocation)
         {
-            _distance.text = $"{Data.PersonalManager.CalculateDistance(_venueModel.Location)} km";  
+            _distance.text = $"{Data.PersonalManager.CalculateDistance(_venueModel.Location):F2} km";  
         }
         else 
         {
@@ -101,8 +101,8 @@ public class AddReservationScreen : AppScreen
         UIContainer.InitView(_timeStartInput, _model.StartTime);
         UIContainer.InitView(_timeEndInput, _model.EndTime);
 
-        UIContainer.InitView(_discountedPrice, _model.DiscountedPrice.ToString());
-        UIContainer.InitView(_originalPrice, _model.OriginalPrice.ToString());
+        UIContainer.InitView(_discountedPrice, _model.DiscountedPrice.Amount == 0 ? "" : _model.DiscountedPrice.ToString());
+        UIContainer.InitView(_originalPrice, _model.OriginalPrice.Amount == 0 ? "" : _model.OriginalPrice.ToString());
         UIContainer.InitView(_notes, _model.Notes);
 
     }

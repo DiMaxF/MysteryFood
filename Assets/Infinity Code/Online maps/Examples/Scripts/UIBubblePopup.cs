@@ -47,7 +47,7 @@ namespace InfinityCode.OnlineMapsDemos
         /// <summary>
         /// This method is called by clicking on the map
         /// </summary>
-        private void OnMapClick()
+        public void OnMapClick()
         {
             // Remove active marker reference
             targetMarker = null;
