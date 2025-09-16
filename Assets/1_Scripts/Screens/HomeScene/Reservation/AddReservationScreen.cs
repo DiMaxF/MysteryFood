@@ -111,7 +111,6 @@ public class AddReservationScreen : AppScreen
             _price.text = "—";
             return;
         }
-        //TODO convert to currency
         _saveMoney.text = $"{(orPrice - disPrice) * _model.Quantity}";
         _price.text = $"{disPrice * _model.Quantity}";
     }

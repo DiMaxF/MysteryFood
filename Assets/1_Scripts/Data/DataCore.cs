@@ -24,10 +24,6 @@ public class DataCore : MonoBehaviour
         get;
     }
 
-    private AnalyticsManager _analyticsManager;
-
-   
-    public AnalyticsManager Analytics => _analyticsManager;
 
 
     private const string AppDataFileName = "dsdsd.json";
@@ -56,6 +52,17 @@ public class DataCore : MonoBehaviour
         PersonalManager = new PersonalManager(_appData);
     }
 
+    public void ClearData() 
+    {
+        VenueManager.Clear();
+        ReservationManager.Clear();
+        PersonalManager.Clear();
+    }
+
+    public void SetDefault()
+    {
+        PersonalManager.Clear();
+    }
 
     /// <summary>
     /// Discards changes and reloads data.
@@ -72,13 +79,13 @@ public class DataCore : MonoBehaviour
     {
         string json = JsonUtility.ToJson(_appData, true);
         FileManager.WriteToFile(AppDataFileName, json).Forget();
-        Logger.Log("GlobalData saved successfully");
+        Logger.Log("Data saved successfully", "DataCore");
     }
     private void LoadData()
     {
         if (!FileManager.FileExists(AppDataFileName))
         {
-            Logger.Log($"{AppDataFileName} not found, starting with default data");
+            Logger.Log($"{AppDataFileName} not found, starting with default data", "DataCore");
             return;
         }
 

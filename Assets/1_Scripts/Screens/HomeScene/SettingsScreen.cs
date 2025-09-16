@@ -26,10 +26,19 @@ public class SettingsScreen : AppScreen
     [SerializeField] private ButtonView _clearAllData;
     [Header("Overlay")] 
     [SerializeField] private ConfirmPanel _confirmPanel;
+    [SerializeField] private TextConfirmPanel _textConfirmPanel;
 
     private Currency _selectedCurrency => Data.PersonalManager.GetCurrency;
     private int _selectedNotification => Data.PersonalManager.Notification;
 
+    protected override void OnStart()
+    {
+        base.OnStart();
+        UIContainer.RegisterView(_confirmPanel);
+        UIContainer.RegisterView(_textConfirmPanel);
+        _confirmPanel.Hide();
+        _textConfirmPanel.Hide();
+    }
 
     protected override void UpdateViews()
     {
@@ -97,15 +106,17 @@ public class SettingsScreen : AppScreen
 
     private void OnWasteBagChange(string val) 
     {
-    
+        if (!float.TryParse(val, out var waste)) return;
+        Data.PersonalManager.WasteBag = waste;
+        Data.SaveData();
     }
 
     private void OnCOPerChange(string val)
     {
-
+        if (!float.TryParse(val, out var co2e)) return;
+        Data.PersonalManager.CO2E = co2e;
+        Data.SaveData();
     }                    
-
-
 
     private void OnButtonTestNotification() 
     {
@@ -119,11 +130,40 @@ public class SettingsScreen : AppScreen
 
     private void OnButtonRestoreDefaults()
     {
+        UIContainer.InitView(_confirmPanel, "Restore data to defaults?");
+        UIContainer.UnsubscribeFromView(_confirmPanel);
+        UIContainer.SubscribeToView<ConfirmPanel, bool>(_confirmPanel, OnRestoreDefaultsConfirmPanel);
+        _confirmPanel.Show();
+    }
 
+    private void OnRestoreDefaultsConfirmPanel(bool val)
+    {
+        if (val) Data.SetDefault();
+        _confirmPanel.Hide();
     }
 
     private void OnButtonClearData()
     {
+        UIContainer.InitView(_confirmPanel, "This will delete all local data");
+        UIContainer.UnsubscribeFromView(_confirmPanel);
+        UIContainer.SubscribeToView<ConfirmPanel, bool>(_confirmPanel, OnClearDataConfirmPanel);
+        _confirmPanel.Show();
+    }
 
+    private void OnClearDataConfirmPanel(bool val) 
+    {
+        if (val) 
+        {
+            _textConfirmPanel.Show();
+            UIContainer.InitView(_textConfirmPanel, "");
+            UIContainer.SubscribeToView<TextConfirmPanel, bool>(_textConfirmPanel, ClearData);
+        } 
+        _confirmPanel.Hide();
+    }
+
+    private void ClearData(bool val) 
+    {
+        if(val) Data.ClearData();
+        _textConfirmPanel.Hide();
     }
 }

@@ -8,7 +8,8 @@ public class HomeScreen : AppScreen
 {
     [SerializeField] SearchView searchView;
     [SerializeField] ListView venues;
-    [SerializeField] BaseView hintDistance;
+    [SerializeField] ButtonView hintDistance;
+    [SerializeField] ButtonView _noVenues;
     [SerializeField] ButtonView addReservation;
     [SerializeField] ButtonView addVenue;
     [SerializeField] ButtonView savings;
@@ -18,6 +19,14 @@ public class HomeScreen : AppScreen
     protected override void OnStart()
     {
         base.OnStart();
+        if (Data.VenueManager.GetAll().Count == 0)
+        {
+            _noVenues.Show();
+        }
+        else 
+        {
+            _noVenues.Hide();
+        }
     }
 
     protected override void Subscriptions()
@@ -28,6 +37,7 @@ public class HomeScreen : AppScreen
 
         UIContainer.SubscribeToView<ButtonView, object>(addReservation, _ => OnButtonAddReservation());
         UIContainer.SubscribeToView<ButtonView, object>(addVenue, _ => OnButtonAddVenue());
+        UIContainer.SubscribeToView<ButtonView, object>(_noVenues, _ => OnButtonAddVenue());
         UIContainer.SubscribeToView<ListView, VenueModel>(venues, OnVenueAction);
     }
 

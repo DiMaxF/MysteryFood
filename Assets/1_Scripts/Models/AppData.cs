@@ -10,4 +10,6 @@ public class AppData
     public List<ReservationModel> Reservations;
     public Currency Currency;
     public int Notification;
+    public float WasteBag;
+    public float CO2E;
 }

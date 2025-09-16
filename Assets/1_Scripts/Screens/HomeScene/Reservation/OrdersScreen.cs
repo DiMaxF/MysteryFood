@@ -10,6 +10,7 @@ public class OrdersScreen : AppScreen
     [SerializeField] private ToggleView _past;
     [SerializeField] private ToggleView _cancelled;
     [SerializeField] private ListView _list;
+    [SerializeField] private ConfirmPanel _confirm;
 
     private StatusReservation _showCategory = StatusReservation.Booked;
 

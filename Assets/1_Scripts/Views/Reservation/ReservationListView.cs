@@ -63,11 +63,13 @@ public class ReservationListView : View
 
     private void OnButtonCancelled() 
     {
-        TriggerAction(("Open", _model));
+        TriggerAction(("Cancel", _model));
+
     }
 
     private void OnButtonShow() 
     {
-        TriggerAction(("Cancel", _model));
+        TriggerAction(("Open", _model));
+
     }
 }

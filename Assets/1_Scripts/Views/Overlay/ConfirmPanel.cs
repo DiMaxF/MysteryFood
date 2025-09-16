@@ -31,4 +31,9 @@ public class ConfirmPanel : View
         UIContainer.SubscribeToView(_cancel, (object _) => TriggerAction(false));
         UIContainer.SubscribeToView(_confirm, (object _) => TriggerAction(true));
     }
+
+    public void SetActive(bool val) 
+    {
+        _confirm.enabled = val; 
+    }
 }

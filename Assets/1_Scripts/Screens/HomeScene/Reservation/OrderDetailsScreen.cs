@@ -36,14 +36,32 @@ public class OrderDetailsScreen : AppScreen
         if (_model == null) return;
         var venue = Data.VenueManager.GetById(_model.VenueId);
         _name.text = venue.Name;
+        _quantity.text = $"x{_model.Quantity}";
         _location.text = venue.Location.Address;
         UIContainer.InitView(_phone, venue.Phone);
         UIContainer.InitView(_image, venue.ImagePath);
         UIContainer.InitView(_status, _model.Status);
         _totalPrice.text = _model.DiscountedPrice.ToString();
+        _savedMoney.text = $"{(_model.OriginalPrice.Amount - _model.DiscountedPrice.Amount) * _model.Quantity}{Data.PersonalManager.GetCurrency}";
         _reservationId.text = $"ID-{_model.Id}";
+    }
 
+    private void SetViewsByStatus(StatusReservation status) 
+    {
+        switch (status)
+        {
+            case StatusReservation.Booked:
 
+                break;
+            case StatusReservation.Cancelled:
+                break;
+            case StatusReservation.PickedUp:
+                _pickedDate.Show();
+                _cancelReservationButton.Hide();
+                _markedAsPickedButton.Hide();
+                _cancelledDate.Hide();
+                break;
+        }
     }
 
     protected override void OnStart()
