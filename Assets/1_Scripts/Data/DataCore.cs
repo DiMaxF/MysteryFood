@@ -26,7 +26,12 @@ public class DataCore : MonoBehaviour
         private set;
         get;
     }
-
+    public SavingsTrackerManager SavingsTrackerManager
+    {
+        private set;
+        get;
+    }
+    
     private bool FirstEnter 
     {
         get => PlayerPrefs.GetInt("FirstEnter") == 1;
@@ -89,6 +94,7 @@ public class DataCore : MonoBehaviour
         VenueManager = new VenueManager(_appData);
         ReservationManager = new ReservationManager(_appData);
         PersonalManager = new PersonalManager(_appData);
+        SavingsTrackerManager = new SavingsTrackerManager(_appData);
     }
 
     public void ClearData() 

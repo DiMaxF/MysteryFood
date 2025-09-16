@@ -18,8 +18,8 @@ public class EnterCoordinatesView : View
         UIContainer.RegisterView(_confirm);
         UIContainer.RegisterView(_latitude);
         UIContainer.RegisterView(_longtitude);
-        UIContainer.InitView(_longtitude, _geo.Longitude);
-        UIContainer.InitView(_latitude, _geo.Latitude);
+        UIContainer.InitView(_longtitude, _geo.Longitude == 0 ? "" : _geo.Longitude.ToString());
+        UIContainer.InitView(_latitude, _geo.Latitude == 0 ? "" : _geo.Latitude.ToString());
         base.Init(data);
     }
 

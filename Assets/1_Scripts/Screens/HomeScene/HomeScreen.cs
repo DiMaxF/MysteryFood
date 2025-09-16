@@ -36,6 +36,7 @@ public class HomeScreen : AppScreen
 
         UIContainer.SubscribeToView<ButtonView, object>(addReservation, _ => OnButtonAddReservation());
         UIContainer.SubscribeToView<ButtonView, object>(addVenue, _ => OnButtonAddVenue());
+        UIContainer.SubscribeToView<ButtonView, object>(savings, _ => OnButtonSavings());
         UIContainer.SubscribeToView<ButtonView, object>(hintDistance, _ => RequestLocationPermission() );
         //UIContainer.SubscribeToView<ButtonView, object>(_noVenues, _ => OnButtonAddVenue());
         UIContainer.SubscribeToView<ListView, VenueModel>(venues, OnVenueAction);
@@ -66,6 +67,11 @@ public class HomeScreen : AppScreen
 
     }
 
+    private void OnButtonSavings()
+    {
+        Container.Show<SavingsTrackerSreen>();
+
+    }
     private void SelectVenueToReservation(VenueModel venue)
     {
         if (venue != null)

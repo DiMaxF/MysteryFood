@@ -55,8 +55,8 @@ public class PersonalManager : IDataManager
 
     public double CalculateDistance(GeoPoint point)
     {
-        const double R = 6371.0; 
-
+        const double R = 6371.0;
+        if (UserPosition == null) return 0;
         double lat1Rad = DegreesToRadians(UserPosition.Latitude);
         double lon1Rad = DegreesToRadians(UserPosition.Longitude);
         double lat2Rad = DegreesToRadians(point.Latitude);

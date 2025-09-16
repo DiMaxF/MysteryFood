@@ -1,4 +1,5 @@
 using Cysharp.Threading.Tasks;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting;
@@ -13,12 +14,17 @@ public class OrderDetailsScreen : AppScreen
     [SerializeField] private ButtonView _cancelReservationButton;
     [SerializeField] private BaseView _cancelledDate;
     [SerializeField] private BaseView _pickedDate;
-
+    [Header("DateTimes")]
+    [SerializeField] private Text _pickedDateText;
+    [SerializeField] private Text _cancelledDateText;
+    [SerializeField] private Text _createdAtText;
+    [SerializeField] private Text _reminderSchedule;
     [Header("Venue")]
     [SerializeField] private Text _name;
     [SerializeField] private AsyncImageView _image;
     [SerializeField] private Text _location;
     [SerializeField] private ButtonView _phone;
+    [SerializeField] private Text _pickupWindow;
     [Header("Reservation")]
     [SerializeField] private Text _quantity;
     [SerializeField] private Text _totalPrice;
@@ -44,6 +50,12 @@ public class OrderDetailsScreen : AppScreen
         _totalPrice.text = _model.DiscountedPrice.ToString();
         _savedMoney.text = $"{(_model.OriginalPrice.Amount - _model.DiscountedPrice.Amount) * _model.Quantity}{Data.PersonalManager.Currency}";
         _reservationId.text = $"ID-{_model.Id}";
+        _pickedDateText.text = _model.EndAt;
+        _cancelledDateText.text = _model.EndAt;
+        _createdAtText.text = _model.CreatedAt;
+        _reminderSchedule.text = Data.PersonalManager.Notification > 0 ?  $"{Data.PersonalManager.Notification} min before pickup" : "None";
+        SetViewsByStatus(_model.Status);
+        _pickupWindow.text = $"{_model.StartTime}-{_model.EndTime}";
     }
 
     private void SetViewsByStatus(StatusReservation status) 
@@ -51,15 +63,26 @@ public class OrderDetailsScreen : AppScreen
         switch (status)
         {
             case StatusReservation.Booked:
+                _pickedDate.Hide();
+                _cancelReservationButton.Show();
+                _markedAsPickedButton.Show();
+                _cancelledDate.Hide();
+                _showQrButton.Show();
 
                 break;
             case StatusReservation.Cancelled:
+                _pickedDate.Show();
+                _cancelReservationButton.Hide();
+                _markedAsPickedButton.Hide();
+                _cancelledDate.Hide();
+                _showQrButton.Hide();
                 break;
             case StatusReservation.PickedUp:
                 _pickedDate.Show();
                 _cancelReservationButton.Hide();
                 _markedAsPickedButton.Hide();
                 _cancelledDate.Hide();
+                _showQrButton.Show();
                 break;
         }
     }
@@ -76,7 +99,7 @@ public class OrderDetailsScreen : AppScreen
         UIContainer.SubscribeToView(_backButton, (object _) => OnButtonBack());
         UIContainer.SubscribeToView(_showQrButton, (object _) => OnButtonQr());
         UIContainer.SubscribeToView(_markedAsPickedButton, (object _) => OnUpdateStatus(StatusReservation.PickedUp));
-        UIContainer.SubscribeToView(_cancelReservationButton, (object _) => OnUpdateStatus(StatusReservation.PickedUp));
+        UIContainer.SubscribeToView(_cancelReservationButton, (object _) => OnUpdateStatus(StatusReservation.Cancelled));
 
     }
 
@@ -99,6 +122,7 @@ public class OrderDetailsScreen : AppScreen
     private void OnUpdateStatus(StatusReservation status)
     {
         _model.Status = status;
+        _model.EndAt = DateTime.Now.ToString(DateTimeUtils.Full);
         Data.ReservationManager.Update(_model);
         Data.SaveData();
     }

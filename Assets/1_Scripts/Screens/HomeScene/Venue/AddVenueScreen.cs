@@ -82,10 +82,10 @@ public class AddVenueScreen : AppScreen
         UIContainer.InitView(_name, _model.Name);
         UIContainer.InitView(_image, _model.ImagePath);
         UIContainer.InitView(_address, _model.Location.Address);
-        UIContainer.InitView(_phone, _model.Phone.ToString());
-        UIContainer.InitView(_price, _model.Price.ToString());
-        UIContainer.InitView(_lattitude, _model.Location.Latitude);
-        UIContainer.InitView(_longitude, _model.Location.Longitude);
+        UIContainer.InitView(_phone, _model.Phone == 0 ? "" : _model.Phone.ToString());
+        UIContainer.InitView(_price, _model.Price.Amount == 0 ? "" : _model.Price.ToString());
+        UIContainer.InitView(_lattitude, _model.Location.Latitude == 0 ? "" : _model.Location.Latitude.ToString());
+        UIContainer.InitView(_longitude, _model.Location.Longitude == 0 ? "" : _model.Location.Longitude.ToString());
         UIContainer.InitView(_description, _model.Description);
         UIContainer.InitView(_ingredientsAllergens, _model.IngredientsAllergens);
 

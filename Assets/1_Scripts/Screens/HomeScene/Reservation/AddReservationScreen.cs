@@ -46,7 +46,9 @@ public class AddReservationScreen : AppScreen
         if (_model == null)
         {
             _model = new ReservationModel();
-            _model.VenueId = _venueModel.Id;    
+            _model.VenueId = _venueModel.Id;
+            _model.StartTime = _venueModel.StartTime;   
+            _model.EndTime = _venueModel.EndTime;   
         }
         _qrCodeEncodeController.onQREncodeFinished.RemoveAllListeners();
         _qrCodeEncodeController.onQREncodeFinished.AddListener(
