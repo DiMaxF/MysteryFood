@@ -58,6 +58,15 @@ public class AddReservationScreen : AppScreen
         base.OnStart();
         UIContainer.RegisterView(_timePicker);
         _timePicker.Hide();
+
+        if (Data.PersonalManager.PermissionLocation)
+        {
+            _distance.text = $"{Data.PersonalManager.CalculateDistance(_venueModel.Location)} km";  
+        }
+        else 
+        {
+            _distance.text = "—";   
+        }
     }
 
     protected override void Subscriptions()

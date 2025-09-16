@@ -10,6 +10,6 @@ public class CurrencyText : MonoBehaviour
 
     private void OnEnable()
     {
-        _text.text = _data.PersonalManager.GetCurrency.ToString(); 
+        _text.text = _data.PersonalManager.Currency.ToString(); 
     }
 }

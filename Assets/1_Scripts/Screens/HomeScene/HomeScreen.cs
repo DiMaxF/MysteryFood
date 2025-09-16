@@ -9,7 +9,6 @@ public class HomeScreen : AppScreen
     [SerializeField] SearchView searchView;
     [SerializeField] ListView venues;
     [SerializeField] ButtonView hintDistance;
-    [SerializeField] ButtonView _noVenues;
     [SerializeField] ButtonView addReservation;
     [SerializeField] ButtonView addVenue;
     [SerializeField] ButtonView savings;
@@ -19,13 +18,13 @@ public class HomeScreen : AppScreen
     protected override void OnStart()
     {
         base.OnStart();
-        if (Data.VenueManager.GetAll().Count == 0)
+        if (Data.PersonalManager.PermissionLocation)
         {
-            _noVenues.Show();
+            hintDistance.Hide();
         }
         else 
         {
-            _noVenues.Hide();
+            hintDistance.Show();
         }
     }
 
@@ -37,7 +36,8 @@ public class HomeScreen : AppScreen
 
         UIContainer.SubscribeToView<ButtonView, object>(addReservation, _ => OnButtonAddReservation());
         UIContainer.SubscribeToView<ButtonView, object>(addVenue, _ => OnButtonAddVenue());
-        UIContainer.SubscribeToView<ButtonView, object>(_noVenues, _ => OnButtonAddVenue());
+        UIContainer.SubscribeToView<ButtonView, object>(hintDistance, _ => Data.RequestLocationPermission());
+        //UIContainer.SubscribeToView<ButtonView, object>(_noVenues, _ => OnButtonAddVenue());
         UIContainer.SubscribeToView<ListView, VenueModel>(venues, OnVenueAction);
     }
 

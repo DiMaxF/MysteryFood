@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.Threading;
 using UnityEngine;
 using UnityEngine.Networking;
-
+using UnityEngine.Android;
 
 public class LocationManager : MonoBehaviour
 {
@@ -51,15 +51,11 @@ public class LocationManager : MonoBehaviour
             LocationInfo location = Input.location.lastData;
             string address = null;
 
-            if (!cancellationToken.IsCancellationRequested)
-            {
-                address = await ReverseGeocodeAsync(location.latitude, location.longitude, cancellationToken);
-            }
 
             GeoPoint geoPoint = new GeoPoint(
                 location.latitude,
                 location.longitude,
-                 address ?? "Текущая позиция"
+                 address ?? "UserPosition"
             );
 
             return geoPoint;
@@ -76,7 +72,7 @@ public class LocationManager : MonoBehaviour
         }
     }
 
-    private async UniTask<bool> CheckAndRequestPermissionAsync(CancellationToken cancellationToken)
+    public async UniTask<bool> CheckAndRequestPermissionAsync(CancellationToken cancellationToken = default)
     {
 #if UNITY_ANDROID && !UNITY_EDITOR
         if (!Permission.HasUserAuthorizedPermission(Permission.FineLocation))
@@ -103,56 +99,6 @@ public class LocationManager : MonoBehaviour
             Debug.LogError("Таймаут ожидания GPS.");
         }
     }
-
-    private async UniTask<string> ReverseGeocodeAsync(float latitude, float longitude, CancellationToken cancellationToken)
-    {
-        string url = $"https://nominatim.openstreetmap.org/reverse?format=json&lat={latitude}&lon={longitude}&zoom=18&addressdetails=1";
-        using (UnityWebRequest request = UnityWebRequest.Get(url))
-        {
-            request.SetRequestHeader("User-Agent", "UnityApp/1.0"); 
-
-            var operation = request.SendWebRequest();
-            await UniTask.WaitUntil(() => operation.isDone, cancellationToken: cancellationToken);
-
-            if (request.result == UnityWebRequest.Result.Success)
-            {
-                string json = request.downloadHandler.text;
-                int startIndex = json.IndexOf("\"display_name\":\"") + 15;
-                int endIndex = json.IndexOf("\"", startIndex);
-                if (startIndex > 15 && endIndex > startIndex)
-                {
-                    return json.Substring(startIndex, endIndex - startIndex);
-                }
-                Debug.LogWarning("Не удалось извлечь адрес из JSON: " + json);
-                return null;
-            }
-            else
-            {
-                Debug.LogError($"Ошибка Nominatim: {request.error}");
-                return null;
-            }
-        }
-    }
-    /*
-    private async UniTaskVoid ExampleUsage()
-    {
-        GeoPoint point = await GetLocationAsync();
-        if (point != null)
-        {
-            OnlineMaps.instance.position = point.ToVector2();
-            OnlineMaps.instance.zoom = 15;
-
-            OnlineMapsMarker marker = OnlineMapsMarkerManager.CreateItem(point.ToVector2());
-            marker.label = point.Address;
-
-            Debug.Log($"GeoPoint: {point.Address} ({point.Latitude}, {point.Longitude})");
-        }
-    }
-
-    public void RequestLocation()
-    {
-        ExampleUsage().Forget();
-    }*/
 
     void OnApplicationPause(bool pauseStatus)
     {

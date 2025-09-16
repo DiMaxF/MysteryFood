@@ -15,6 +15,12 @@ public class MapScreen : AppScreen
         InitPoints();
         _map.gameObject.SetActive(true);
         _canvasPopup.gameObject.SetActive(true);
+        if (Data.PersonalManager.PermissionLocation) CreateUserPoint(Data.PersonalManager.UserPosition);
+    }
+
+    private void CreateUserPoint(GeoPoint point) 
+    {
+        _bubbles.CreatePoint(point);
     }
 
     public void GoToPoint(GeoPoint point)

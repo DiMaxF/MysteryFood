@@ -40,6 +40,23 @@ public class VenueListView : View
             price.text = _model.Price.ToString();
             pickupToday.text = $"{_model.StartTime}-{_model.EndTime}";
             name.text = _model.Name;
+            if (!DataCore.Instance.PersonalManager.PermissionLocation)
+            {
+                distance.text = "—";
+            }
+            else 
+            {
+                if (_model.Location.Latitude != 0)
+                {
+                    distance.text = $"{DataCore.Instance.PersonalManager.CalculateDistance(_model.Location)} km";
+                    DataCore.Instance.PersonalManager.CalculateDistance(_model.Location);
+                }
+                else
+                {
+
+                    distance.text = "—";
+                }
+            }
         }
     }
 }

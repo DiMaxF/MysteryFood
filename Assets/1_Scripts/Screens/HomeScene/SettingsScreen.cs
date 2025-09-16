@@ -28,7 +28,7 @@ public class SettingsScreen : AppScreen
     [SerializeField] private ConfirmPanel _confirmPanel;
     [SerializeField] private TextConfirmPanel _textConfirmPanel;
 
-    private Currency _selectedCurrency => Data.PersonalManager.GetCurrency;
+    private Currency _selectedCurrency => Data.PersonalManager.Currency;
     private int _selectedNotification => Data.PersonalManager.Notification;
 
     protected override void OnStart()
@@ -45,6 +45,8 @@ public class SettingsScreen : AppScreen
         base.UpdateViews();
         UpdateNotificationsToggles();
         UpdateCurrencyToggles();
+        UIContainer.InitView(_wastePerBage, Data.PersonalManager.WasteBag.ToString());
+        UIContainer.InitView(_CO2Bage, Data.PersonalManager.CO2E.ToString());
     }
 
     protected override void Subscriptions()
@@ -71,7 +73,7 @@ public class SettingsScreen : AppScreen
 
     private void SetCurrency(Currency currency)
     {
-        Data.PersonalManager.GetCurrency = currency;
+        Data.PersonalManager.Currency = currency;
         Data.SaveData();
         UpdateCurrencyToggles();
     }
@@ -138,7 +140,12 @@ public class SettingsScreen : AppScreen
 
     private void OnRestoreDefaultsConfirmPanel(bool val)
     {
-        if (val) Data.SetDefault();
+        if (val) 
+        {
+            Data.SetDefault();
+            Data.SaveData();
+            UpdateViews();
+        }
         _confirmPanel.Hide();
     }
 
@@ -163,7 +170,12 @@ public class SettingsScreen : AppScreen
 
     private void ClearData(bool val) 
     {
-        if(val) Data.ClearData();
+        if (val) 
+        {
+            Data.ClearData();
+            Data.SaveData();
+            UpdateViews();
+        } 
         _textConfirmPanel.Hide();
     }
 }

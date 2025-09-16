@@ -21,7 +21,7 @@ public class VenueManager : IDataManager
 
     public void Clear()
     {
-
+        _appData.Venues = new List<VenueModel>();
     }
 
     public List<VenueModel> GetVenuesWithCoordinates() 

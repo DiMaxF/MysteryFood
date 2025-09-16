@@ -1,5 +1,7 @@
 using Cysharp.Threading.Tasks;
 using System;
+using System.Threading;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class DataCore : MonoBehaviour
@@ -7,6 +9,7 @@ public class DataCore : MonoBehaviour
     public static DataCore Instance { get; private set; }
 
     [SerializeField] AppData _appData = new AppData();
+    [SerializeField] LocationManager _location;
 
     public VenueManager VenueManager 
     {
@@ -24,7 +27,11 @@ public class DataCore : MonoBehaviour
         get;
     }
 
-
+    private bool FirstEnter 
+    {
+        get => PlayerPrefs.GetInt("FirstEnter") == 1;
+        set => PlayerPrefs.SetInt("FirstEnter", value ? 1 : 0); 
+    }
 
     private const string AppDataFileName = "dsdsd.json";
 
@@ -43,6 +50,38 @@ public class DataCore : MonoBehaviour
         {
             Destroy(gameObject);
         }
+        if (FirstEnter) 
+        {
+            RequestLocationPermission();
+        }
+        if (PersonalManager.PermissionLocation) 
+        {
+            UpdateUserLocation();
+        }
+        FirstEnter = false;
+    }
+
+    public async void RequestLocationPermission() 
+    {
+        if (!await _location.CheckAndRequestPermissionAsync())
+        {
+            PersonalManager.PermissionLocation = false;
+        }
+        else 
+        {
+            UpdateUserLocation();
+            PersonalManager.PermissionLocation = true;
+        }
+        
+    }
+
+    private async void UpdateUserLocation() 
+    {
+        while (true) 
+        {
+            await UniTask.Delay(TimeSpan.FromMinutes(1));   
+            PersonalManager.UserPosition = await _location.GetLocationAsync();
+        } 
     }
 
     private void InitializeManagers()

@@ -12,4 +12,7 @@ public class AppData
     public int Notification;
     public float WasteBag;
     public float CO2E;
+    public bool PermissionLocation;
+    public bool PermissionNotification;
+    public GeoPoint UserLocation;
 }

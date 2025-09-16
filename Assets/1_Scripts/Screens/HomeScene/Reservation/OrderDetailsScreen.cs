@@ -42,7 +42,7 @@ public class OrderDetailsScreen : AppScreen
         UIContainer.InitView(_image, venue.ImagePath);
         UIContainer.InitView(_status, _model.Status);
         _totalPrice.text = _model.DiscountedPrice.ToString();
-        _savedMoney.text = $"{(_model.OriginalPrice.Amount - _model.DiscountedPrice.Amount) * _model.Quantity}{Data.PersonalManager.GetCurrency}";
+        _savedMoney.text = $"{(_model.OriginalPrice.Amount - _model.DiscountedPrice.Amount) * _model.Quantity}{Data.PersonalManager.Currency}";
         _reservationId.text = $"ID-{_model.Id}";
     }
 

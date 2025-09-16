@@ -24,12 +24,12 @@ public class FileManager : MonoBehaviour
                 using StreamReader reader = new StreamReader(path);
                 return reader.ReadToEnd();
             }
-            Debug.LogWarning($"File not found: {path}");
+            Logger.LogWarning($"File not found: {path}", "FileManager");
             return null;
         }
         catch (Exception ex)
         {
-            Debug.LogError($"Failed to read file {fileName}: {ex.Message}");
+            Logger.LogError($"Failed to read file {fileName}: {ex.Message}", "FileManager");
             return null;
         }
     }
@@ -43,12 +43,12 @@ public class FileManager : MonoBehaviour
             using (var writer = new StreamWriter(fileStream))
             {
                 await writer.WriteAsync(content);
-                Debug.Log($"File written to: {path}");
+                Logger.Log($"File written to: {path}", "FileManager");
             }
         }
         catch (Exception ex)
         {
-            Debug.LogError($"Failed to write file {fileName}: {ex.Message}");
+            Logger.LogError($"Failed to write file {fileName}: {ex.Message}", "FileManager");
         }
     }
 
@@ -60,7 +60,7 @@ public class FileManager : MonoBehaviour
         }
         catch (Exception ex)
         {
-            Debug.LogError($"Error checking file existence {fileName}: {ex.Message}");
+            Logger.LogError($"Error checking file existence {fileName}: {ex.Message}", "FileManager");
             return false;
         }
     }
@@ -74,11 +74,11 @@ public class FileManager : MonoBehaviour
     {
         string fileName = $"catch_{DateTime.Now.Ticks}.jpg";
 #if UNITY_WEBGL && !UNITY_EDITOR
-        string savePath = fileName; // Для IndexedDB используем только имя файла
+        string savePath = fileName;
 #else
-        string savePath = GetFilePath(fileName); // Для non-WebGL полный путь
+        string savePath = GetFilePath(fileName);
 #endif
-        Debug.Log($"Saving image to: {savePath}");
+        Logger.Log($"Saving image to: {savePath}", "FileManager");
 
         try
         {
@@ -89,7 +89,7 @@ public class FileManager : MonoBehaviour
                 Debug.LogError("Base64 data is empty");
                 return null;
             }
-            Debug.Log($"Saving base64 data (length: {base64.Length}) to IndexedDB");
+            Logger.Log($"Saving base64 data (length: {base64.Length}) to IndexedDB", "FileManager");
 
             var tcs = new UniTaskCompletionSource<string>();
             var callbackObject = new GameObject("ImageSaveCallback");
@@ -110,14 +110,14 @@ public class FileManager : MonoBehaviour
             return await tcs.Task;
 #else
             byte[] imageBytes = isBase64 ? Convert.FromBase64String(data) : File.ReadAllBytes(data);
-            Debug.Log($"Writing {imageBytes.Length} bytes to: {savePath}");
+            Logger.Log($"Writing {imageBytes.Length} bytes to: {savePath}", "FileManager");
             await File.WriteAllBytesAsync(savePath, imageBytes);
             return savePath;
 #endif
         }
         catch (Exception ex)
         {
-            Debug.LogError($"Failed to save image {fileName}: {ex.Message}");
+            Logger.LogError($"Failed to save image {fileName}: {ex.Message}", "FileManager");
             return null;
         }
         finally
@@ -131,18 +131,18 @@ public class FileManager : MonoBehaviour
     {
         string fileName = $"{fileNamePrefix}_{DateTime.Now.Second}_{DateTime.Now.Ticks}.png";
 #if UNITY_WEBGL && !UNITY_EDITOR
-        string savePath = fileName; // Для IndexedDB только имя файла
+        string savePath = fileName; 
 #else
-        string savePath = GetFilePath(fileName); // Для non-WebGL полный путь
+        string savePath = GetFilePath(fileName);
 #endif
-        Debug.Log($"Saving texture to: {savePath}");
+        Logger.Log($"Saving texture to: {savePath}", "FileManager");
 
         try
         {
             byte[] textureBytes = texture.EncodeToPNG();
             if (textureBytes == null || textureBytes.Length == 0)
             {
-                Debug.LogError("Texture encoding failed: Empty or null bytes");
+                Logger.LogError("Texture encoding failed: Empty or null bytes", "FileManager");
                 return null;
             }
 
@@ -150,10 +150,10 @@ public class FileManager : MonoBehaviour
             string base64 = Convert.ToBase64String(textureBytes);
             if (string.IsNullOrEmpty(base64))
             {
-                Debug.LogError("Base64 conversion failed for texture");
+                Logger.LogError("Base64 conversion failed for texture", "FileManager");
                 return null;
             }
-            Debug.Log($"Saving texture base64 data (length: {base64.Length}) to IndexedDB");
+            Logger.Log($"Saving texture base64 data (length: {base64.Length}) to IndexedDB", "FileManager");
 
             var tcs = new UniTaskCompletionSource<string>();
             var callbackObject = new GameObject("ImageSaveCallback");
@@ -174,13 +174,13 @@ public class FileManager : MonoBehaviour
             return await tcs.Task;
 #else
             await File.WriteAllBytesAsync(savePath, textureBytes);
-            Debug.Log($"Texture saved to: {savePath}");
+            Logger.Log($"Texture saved to: {savePath}", "FileManager");
             return savePath;
 #endif
         }
         catch (Exception ex)
         {
-            Debug.LogError($"Failed to save texture {fileName}: {ex.Message}");
+            Logger.LogError($"Failed to save texture {fileName}: {ex.Message}", "FileManager");
             return null;
         }
         finally
@@ -192,12 +192,11 @@ public class FileManager : MonoBehaviour
 
     public static async UniTask<Texture2D> LoadImage(string fileName)
     {
-        Debug.Log($"Loading image: {fileName}");
+        Logger.Log($"Loading image: {fileName}", "FileManager");
 
         try
         {
 #if UNITY_WEBGL && !UNITY_EDITOR
-            // Для WebGL используем только имя файла (без пути)
             string loadFileName = Path.GetFileName(fileName);
             var tcs = new UniTaskCompletionSource<string>();
             var callbackObject = new GameObject("ImageLoadCallback");
@@ -221,12 +220,12 @@ public class FileManager : MonoBehaviour
             Texture2D texture = new Texture2D(2, 2);
             if (texture.LoadImage(imageBytes))
             {
-                Debug.Log($"Image loaded successfully: {fileName}");
+                Logger.Log($"Image loaded successfully: {fileName}", "FileManager");
                 return texture;
             }
             else
             {
-                Debug.LogError($"Failed to load image data: {fileName}");
+                Logger.LogError($"Failed to load image data: {fileName}", "FileManager");
                 Destroy(texture);
                 return null;
             }
@@ -234,7 +233,7 @@ public class FileManager : MonoBehaviour
             string path = fileName.StartsWith(Application.persistentDataPath) ? fileName : GetFilePath(fileName);
             if (!File.Exists(path))
             {
-                Debug.LogError($"File not found: {path}");
+                Logger.LogError($"File not found: {path}", "FileManager");
                 return null;
             }
 
@@ -242,12 +241,12 @@ public class FileManager : MonoBehaviour
             Texture2D texture = new Texture2D(2, 2);
             if (texture.LoadImage(imageBytes))
             {
-                Debug.Log($"Image loaded successfully: {path}");
+                Logger.Log($"Image loaded successfully: {path}", "FileManager");
                 return texture;
             }
             else
             {
-                Debug.LogError($"Failed to load image data: {path}");
+                Logger.LogError($"Failed to load image data: {path}", "FileManager");
                 Destroy(texture);
                 return null;
             }
@@ -255,7 +254,7 @@ public class FileManager : MonoBehaviour
         }
         catch (Exception ex)
         {
-            Debug.LogError($"Failed to load image {fileName}: {ex.Message}");
+            Logger.LogError($"Failed to load image {fileName}: {ex.Message}", "FileManager");
             return null;
         }
         finally
@@ -276,7 +275,7 @@ public class FileManager : MonoBehaviour
 
         public void OnImageLoaded(string base64Data)
         {
-            Debug.Log($"Received base64 data from IndexedDB (length: {base64Data?.Length ?? 0}): {(base64Data != null && base64Data.Length > 50 ? base64Data.Substring(0, 50) + "..." : base64Data ?? "null")}");
+            Logger.Log($"Received base64 data from IndexedDB (length: {base64Data?.Length ?? 0}): {(base64Data != null && base64Data.Length > 50 ? base64Data.Substring(0, 50) + "..." : base64Data ?? "null")}", "ImageLoadCallback");
             callback?.Invoke(base64Data);
             Destroy(gameObject);
         }
@@ -293,7 +292,7 @@ public class FileManager : MonoBehaviour
 
         public void OnImageSaved(string result)
         {
-            Debug.Log($"Save result: {result}");
+            Logger.Log($"Save result: {result}", "ImageSaveCallback");
             callback?.Invoke(result);
             Destroy(gameObject);
         }

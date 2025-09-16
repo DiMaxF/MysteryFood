@@ -22,12 +22,13 @@ namespace InfinityCode.OnlineMapsDemos
         /// Bubble popup
         /// </summary>
         public GameObject bubble;
+        public GameObject user;
 
         /// <summary>
         /// VenueListView component for displaying venue data
         /// </summary>
         public VenueListView venueListView;
-
+        public Texture2D userTexture;   
         /// <summary>
         /// Array of VenueModel data
         /// </summary>
@@ -42,7 +43,7 @@ namespace InfinityCode.OnlineMapsDemos
         /// Reference to active marker
         /// </summary>
         private OnlineMapsMarker targetMarker;
-
+        private OnlineMapsMarker userMarker;
         /// <summary>
         /// This method is called by clicking on the map
         /// </summary>
@@ -80,7 +81,24 @@ namespace InfinityCode.OnlineMapsDemos
             // Update popup position
             UpdateBubblePosition();
         }
+        public void CreatePoint(GeoPoint point)
+        {
+            if (point == null) return;
 
+            if (userMarker != null)
+            {
+                userMarker.SetPosition(point.Longitude, point.Latitude);
+            }
+            else
+            {
+                userMarker = OnlineMapsMarkerManager.CreateItem(point.Longitude, point.Latitude, userTexture);
+                userMarker["data"] = null; 
+                userMarker.OnClick += (marker) =>
+                {
+
+                };
+            }
+        }
         /// <summary>
         /// Start is called on the frame when a script is enabled just before any of the Update methods are called the first time.
         /// </summary>

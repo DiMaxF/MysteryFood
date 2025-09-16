@@ -1,9 +1,5 @@
 using Cysharp.Threading.Tasks;
 using System;
-using System.Collections;
-using System.Collections.Generic;
-using Unity.Android.Gradle;
-using Unity.VisualScripting;
 using UnityEngine;
 
 public class AddVenueScreen : AppScreen
@@ -151,7 +147,7 @@ public class AddVenueScreen : AppScreen
     private void OnPriceEdit(string val)
     {
         if (!int.TryParse(val, out var price)) return;
-        _model.Price = new CurrencyModel(price, Data.PersonalManager.GetCurrency);
+        _model.Price = new CurrencyModel(price, Data.PersonalManager.Currency);
         ValidateModel();
     }
     private void OnDescriptionEdit(string val)
@@ -219,6 +215,7 @@ public class AddVenueScreen : AppScreen
                 {
                     UIContainer.InitView(_image, selectedImagePath);
                     _model.ImagePath = selectedImagePath;
+                    UpdateViews();
                 }
                 else
                 {

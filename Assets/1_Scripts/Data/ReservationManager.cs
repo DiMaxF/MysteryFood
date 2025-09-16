@@ -19,7 +19,7 @@ public class ReservationManager : IDataManager
 
     public void Clear()
     {
-        
+        _appData.Reservations = new List<ReservationModel>();
     }
 
     public void Add(ReservationModel model)
