@@ -1,6 +1,7 @@
 using NUnit.Framework;
 using System.Collections;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using UnityEngine;
 
@@ -56,9 +57,20 @@ public class SelectVenueView : View
 
     private void SelectVenue(VenueToggleView.Data venue) 
     {
-        _selectedVenue = venue.Model;
+        if (venue != null)
+        {
+            _selectedVenue = venue.Model;
 
-        UpdateData();
-        UpdateUI();
+            UpdateData();
+            UpdateUI();
+        }
+        else 
+        {
+            var screen = AppContainer.Instance.GetScreen<AddVenueScreen>();
+            screen.SetModel(null);
+            AppContainer.Instance.Show(screen);
+            Hide();
+        }
+
     }
 }

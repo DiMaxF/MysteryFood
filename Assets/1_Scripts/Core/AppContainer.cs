@@ -6,6 +6,7 @@ using UnityEngine;
 
 public class AppContainer : MonoBehaviour
 {
+    public static AppContainer Instance { get; private set; }
     [Header("Base")]
     [SerializeField] AppScreen firstScreen;
     [SerializeField] List<AppScreen> screens = new List<AppScreen>();
@@ -22,6 +23,7 @@ public class AppContainer : MonoBehaviour
 
     private void Start()
     {
+        Instance = this;
         if (navigationBar != null) UIContainer.RegisterView(navigationBar, true);
 
         foreach (var screen in screens) screen.Init(core, this);

@@ -11,6 +11,7 @@ public class OrdersScreen : AppScreen
     [SerializeField] private ToggleView _cancelled;
     [SerializeField] private ListView _list;
     [SerializeField] private ConfirmPanel _confirm;
+    [SerializeField] private SelectVenueView _selectVenue;
 
     private StatusReservation _showCategory = StatusReservation.Booked;
 
@@ -22,6 +23,8 @@ public class OrdersScreen : AppScreen
     protected override void Subscriptions()
     {
         base.Subscriptions();
+        UIContainer.RegisterView(_selectVenue);
+        UIContainer.SubscribeToView<SelectVenueView, VenueModel>(_selectVenue, SelectVenueToReservation);
         UIContainer.SubscribeToView<ListView, (string, ReservationModel)>(_list, ListAction);
         UIContainer.SubscribeToView<ToggleView, bool>(_active, val => SetCategory(StatusReservation.Booked));
         UIContainer.SubscribeToView<ToggleView, bool>(_past, val => SetCategory(StatusReservation.PickedUp));
@@ -56,11 +59,33 @@ public class OrdersScreen : AppScreen
             screen.SetModel(action.Item2);
             Container.Show(screen);
         }
-        else //cancel
+        else if (action.Item1 == "Cancel")
         {
             action.Item2.Status = StatusReservation.Cancelled;
             Data.ReservationManager.Update(action.Item2);
             Data.SaveData();
         }
+        else { OnButtonAddReservation(); }
     }
+    private void OnButtonAddReservation()
+    {
+        UIContainer.InitView(_selectVenue, Data.VenueManager.GetAll());
+        _selectVenue.Show();
+
+    }
+    private void SelectVenueToReservation(VenueModel venue)
+    {
+        if (venue != null)
+        {
+            var screen = Container.GetScreen<AddReservationScreen>();
+            screen.SetVenue(venue);
+            Container.Show(screen);
+        }
+        else
+        {
+
+        }
+        _selectVenue.Hide();
+    }
+
 }

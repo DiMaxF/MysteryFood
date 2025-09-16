@@ -67,6 +67,8 @@ public class AddReservationScreen : AppScreen
         {
             _distance.text = "—";   
         }
+        UIContainer.InitView(_timeStartInput, _venueModel.StartTime);
+        UIContainer.InitView(_timeEndInput, _venueModel.EndTime);
     }
 
     protected override void Subscriptions()
