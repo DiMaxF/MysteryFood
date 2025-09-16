@@ -17,6 +17,7 @@ public class VenueScreen : AppScreen
     [SerializeField] private Text _description;
     [SerializeField] private Text _ingridientsAllergenes;
     [SerializeField] private Text _price;
+    [SerializeField] private Text _pickupWindow;
     [SerializeField] private ButtonView _viewOnMap;
     [SerializeField] private ButtonView _reserveForPickup;
     [Header("Overlay")]
@@ -48,6 +49,7 @@ public class VenueScreen : AppScreen
         _ingridientsAllergenes.text = _model.IngredientsAllergens;
         _price.text = _model.Price.ToString();
         _name.text = _model.Name;
+        _pickupWindow.text = $"{_model.StartTime}-{_model.EndTime}";    
 
     }
 

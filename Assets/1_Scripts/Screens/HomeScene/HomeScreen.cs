@@ -36,9 +36,15 @@ public class HomeScreen : AppScreen
 
         UIContainer.SubscribeToView<ButtonView, object>(addReservation, _ => OnButtonAddReservation());
         UIContainer.SubscribeToView<ButtonView, object>(addVenue, _ => OnButtonAddVenue());
-        UIContainer.SubscribeToView<ButtonView, object>(hintDistance, _ => Data.RequestLocationPermission());
+        UIContainer.SubscribeToView<ButtonView, object>(hintDistance, _ => RequestLocationPermission() );
         //UIContainer.SubscribeToView<ButtonView, object>(_noVenues, _ => OnButtonAddVenue());
         UIContainer.SubscribeToView<ListView, VenueModel>(venues, OnVenueAction);
+    }
+
+    private void RequestLocationPermission() 
+    {
+        Data.RequestLocationPermission();
+        hintDistance.Hide();
     }
 
     protected override void UpdateViews()
