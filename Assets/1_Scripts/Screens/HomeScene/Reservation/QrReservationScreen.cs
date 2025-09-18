@@ -11,9 +11,16 @@ public class QrReservationScreen : AppScreen
     [SerializeField] private AsyncImageView _qrImage;
     [SerializeField] private ButtonView _hintNotification;
     [SerializeField] private ReservationShortView _reservationInfo;
-
+    [Header("Overlay")]
+    [SerializeField] private ConfirmPanel _confirm;
     private ReservationModel _model;
     public void SetModel(ReservationModel model) => _model = model;
+
+    protected override void OnStart()
+    {
+        base.OnStart();
+        UIContainer.RegisterView(_confirm); 
+    }
 
     protected override void UpdateViews()
     {
@@ -26,6 +33,7 @@ public class QrReservationScreen : AppScreen
     {
         base.Subscriptions();
         UIContainer.SubscribeToView(_back, (object _) => OnButtonBack());
+        UIContainer.SubscribeToView(_confirm, (object _) => Container.Back().Forget());
         UIContainer.SubscribeToView(_fullInfo, (object _) => OnButtonFullInfo());
         UIContainer.SubscribeToView(_markedAsPickedUp, (object _) => OnButtonMarked());
 
@@ -33,7 +41,8 @@ public class QrReservationScreen : AppScreen
 
     private void OnButtonBack()
     {
-        Container.Back().Forget();
+        UIContainer.InitView(_confirm, "Outside pickup window. Confirm?");
+        _confirm.Show();
     }
 
     private void OnButtonFullInfo() 

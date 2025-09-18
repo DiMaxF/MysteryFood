@@ -1,9 +1,7 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using UnityEngine;
 
 public class SavingsTrackerManager : IDataManager
 {
@@ -13,9 +11,7 @@ public class SavingsTrackerManager : IDataManager
         _appData = appData ?? throw new ArgumentNullException(nameof(appData));
     }
 
-
     private FilterOptions _filters;
-
 
     public void ApplyFilters(FilterOptions filters)
     {
@@ -29,18 +25,22 @@ public class SavingsTrackerManager : IDataManager
 
     private List<ReservationModel> GetFilteredReservations()
     {
-        var reservations = _appData.Reservations; 
+        var reservations = _appData.Reservations;
 
         if (_filters != null)
         {
             if (_filters.FromDate.HasValue)
             {
-                reservations = reservations.Where(r => DateTime.Parse(r.CreatedAt) >= _filters.FromDate.Value).ToList();
+                reservations = reservations.Where(r =>
+                    DateTime.ParseExact(r.CreatedAt, DateTimeUtils.Full, CultureInfo.InvariantCulture) >= _filters.FromDate.Value)
+                    .ToList();
             }
 
             if (_filters.ToDate.HasValue)
             {
-                reservations = reservations.Where(r => DateTime.Parse(r.CreatedAt) <= _filters.ToDate.Value).ToList();
+                reservations = reservations.Where(r =>
+                    DateTime.ParseExact(r.CreatedAt, DateTimeUtils.Full, CultureInfo.InvariantCulture) <= _filters.ToDate.Value)
+                    .ToList();
             }
 
             if (_filters.VenueId.HasValue)
@@ -59,13 +59,13 @@ public class SavingsTrackerManager : IDataManager
 
     public float GetTotalSaved()
     {
-        var filtered = GetFilteredReservations().Where(r => r.Status == StatusReservation.PickedUp);
+        var filtered = GetFilteredReservations();
         return filtered.Sum(r => (r.OriginalPrice.Amount - r.DiscountedPrice.Amount) * r.Quantity);
     }
 
     public int GetBagsCollected()
     {
-        var filtered = GetFilteredReservations().Where(r => r.Status == StatusReservation.PickedUp);
+        var filtered = GetFilteredReservations();//.Where(r => r.Status == StatusReservation.PickedUp);
         return filtered.Sum(r => r.Quantity);
     }
 
@@ -81,13 +81,13 @@ public class SavingsTrackerManager : IDataManager
 
     public ChartData GetMonthlySavingsChartData()
     {
-        var filtered = GetFilteredReservations().Where(r => r.Status == StatusReservation.PickedUp);
+        var filtered = GetFilteredReservations();//.Where(r => r.Status == StatusReservation.PickedUp);
         var monthlySavings = new Dictionary<string, float>();
 
         foreach (var r in filtered)
         {
-            DateTime dt = DateTime.Parse(r.CreatedAt);
-            string key = dt.ToString("MMM yyyy");
+            DateTime dt = DateTime.ParseExact(r.CreatedAt, DateTimeUtils.Full, CultureInfo.InvariantCulture);
+            string key = dt.ToString("MMM yyyy", CultureInfo.InvariantCulture);
             float saving = (r.OriginalPrice.Amount - r.DiscountedPrice.Amount) * r.Quantity;
             if (monthlySavings.ContainsKey(key))
             {
@@ -116,13 +116,13 @@ public class SavingsTrackerManager : IDataManager
 
     public ChartData GetBagsOverTimeChartData()
     {
-        var filtered = GetFilteredReservations().Where(r => r.Status == StatusReservation.PickedUp);
+        var filtered = GetFilteredReservations();//.Where(r => r.Status == StatusReservation.PickedUp);
         var monthlyBags = new Dictionary<string, int>();
 
         foreach (var r in filtered)
         {
-            DateTime dt = DateTime.Parse(r.CreatedAt);
-            string key = dt.ToString("MMM yyyy");
+            DateTime dt = DateTime.ParseExact(r.CreatedAt, DateTimeUtils.Full, CultureInfo.InvariantCulture);
+            string key = dt.ToString("MMM yyyy", CultureInfo.InvariantCulture);
             if (monthlyBags.ContainsKey(key))
             {
                 monthlyBags[key] += r.Quantity;
@@ -151,9 +151,8 @@ public class SavingsTrackerManager : IDataManager
     public List<ReservationModel> GetRecentActivity(int count = 10)
     {
         return GetFilteredReservations()
-            .OrderByDescending(r => DateTime.Parse(r.CreatedAt))
+            .OrderByDescending(r => DateTime.ParseExact(r.CreatedAt, DateTimeUtils.Full, CultureInfo.InvariantCulture))
             .Take(count)
             .ToList();
     }
-
 }

@@ -21,8 +21,10 @@ public class ToggleView : View
 
     public override void Init<T>(T data)
     {
+        var state = _isOn;
         if (data is bool initialState) _isOn = initialState;
         base.Init(data);
+        if (state == _isOn) return;
         Animate();
     }
 

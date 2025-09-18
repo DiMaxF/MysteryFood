@@ -18,6 +18,7 @@ public class OrdersScreen : AppScreen
     protected override void OnStart()
     {
         base.OnStart();
+        UIContainer.RegisterView(_confirm);
     }
 
     protected override void Subscriptions()
@@ -61,12 +62,26 @@ public class OrdersScreen : AppScreen
         }
         else if (action.Item1 == "Cancel")
         {
-            action.Item2.Status = StatusReservation.Cancelled;
-            Data.ReservationManager.Update(action.Item2);
-            Data.SaveData();
+            UIContainer.InitView(_confirm, "Cancel this reservation?");
+            UIContainer.SubscribeToView<ConfirmPanel, bool>(_confirm, (val) => ResultCancelConfirm(val, action.Item2));
+            _confirm.Show();
+            
         }
         else { OnButtonAddReservation(); }
     }
+
+    private void ResultCancelConfirm(bool val, ReservationModel reservation) 
+    {
+        if (val) 
+        {
+            reservation.Status = StatusReservation.Cancelled;
+            Data.ReservationManager.Update(reservation);
+            Data.SaveData();
+        }
+        _confirm.Hide();
+    }
+
+
     private void OnButtonAddReservation()
     {
         UIContainer.InitView(_selectVenue, Data.VenueManager.GetAll());

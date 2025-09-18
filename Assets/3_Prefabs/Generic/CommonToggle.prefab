@@ -11,7 +11,6 @@ GameObject:
   - component: {fileID: 2110895434168523600}
   - component: {fileID: 2422857334583239504}
   - component: {fileID: 8576093491711730556}
-  - component: {fileID: 825524259201790040}
   m_Layer: 5
   m_Name: Handle
   m_TagString: Untagged
@@ -59,7 +58,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Color: {r: 0, g: 0, b: 0, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -76,37 +75,6 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
---- !u!114 &825524259201790040
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3427860604889442124}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 52c162dc854d2f24fa639ba0623de5ef, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  algorithm: 0
-  size: 8
-  spread: 0
-  useGlobalAngle: 0
-  offsetAngle: 90
-  offsetDistance: 5
-  offset: {x: 0.00000029802325, y: -5}
-  color: {r: 0, g: 0, b: 0, a: 0.6}
-  inset: 0
-  blendMode: 0
-  useCasterAlpha: 1
-  ignoreCasterColor: 0
-  colorBleedMode: 2
-  disableFitCompensation: 0
-  shadowAsSibling: 0
-  cutout: 0
-  baked: 0
-  modifiedFromInspector: 0
-  bakedShadows: []
 --- !u!1 &3466612010216110461
 GameObject:
   m_ObjectHideFlags: 0
@@ -171,7 +139,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0.27450982, g: 0.3882353, b: 0.7372549, a: 1}
+  m_Color: {r: 0.49803922, g: 0.972549, b: 0.011764706, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -271,8 +239,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   config: {fileID: 11400000, guid: 9148cbc6c2d5e1246b29535a089c2682, type: 2}
-  show: {r: 0.27450982, g: 0.38823533, b: 0.7372549, a: 1}
-  hide: {r: 0.22352943, g: 0.22352943, b: 0.2392157, a: 1}
+  show: {r: 0.49803922, g: 0.972549, b: 0.011764706, a: 1}
+  hide: {r: 0.44313726, g: 0.44313726, b: 0.44313726, a: 1}
   _image: {fileID: 1363882223508760843}
 --- !u!114 &590860209596162262
 MonoBehaviour:

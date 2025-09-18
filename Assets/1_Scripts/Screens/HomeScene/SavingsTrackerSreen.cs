@@ -17,6 +17,19 @@ public class SavingsTrackerSreen : AppScreen
     [SerializeField] private RowChartView _monthlySavings;
     [SerializeField] private LineChartView _bagsOverTime;
     [SerializeField] private ListView _recentActivity;
+    [Header("Overlay")]
+    [SerializeField] private FiltersSavingsView _filtersView;
+    private FilterOptions _filtersOptions = new FilterOptions();
+    protected override void OnStart()
+    {
+        _filtersOptions.Statuses = new List<StatusReservation> { StatusReservation.PickedUp };
+        Data.SavingsTrackerManager.ApplyFilters(_filtersOptions);
+
+        base.OnStart();
+        UIContainer.RegisterView(_filtersView);
+        UIContainer.InitView(_filtersView, _filtersOptions);
+        _filtersView.Hide();
+    }
 
     protected override void UpdateViews()
     {
@@ -34,5 +47,18 @@ public class SavingsTrackerSreen : AppScreen
         base.Subscriptions();
         UIContainer.SubscribeToView(_back, (object _) => Container.Back().Forget());
         UIContainer.SubscribeToView(_orders, (object _) => Container.Show<OrdersScreen>());
+        UIContainer.SubscribeToView(_filters, (object _) => ShowFilters());
+        UIContainer.SubscribeToView<FiltersSavingsView, FilterOptions>(_filtersView, ApplyFilters);
+    }
+    private void ApplyFilters(FilterOptions filters) 
+    {
+        Data.SavingsTrackerManager.ApplyFilters(filters);
+        UpdateViews();
+        _filtersView.Hide();
+    }
+
+    private void ShowFilters() 
+    {
+        _filtersView.Show();
     }
 }
