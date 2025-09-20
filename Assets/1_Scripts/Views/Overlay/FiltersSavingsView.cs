@@ -21,7 +21,7 @@ public class FiltersSavingsView : View
 
     private DateRanges _selectedDateRange;
     private DataCore _data => DataCore.Instance;
-    private FilterOptions _filters;
+    [SerializeField] private FilterOptions _filters;
 
     public override void Init<T>(T data)
     {
@@ -56,6 +56,21 @@ public class FiltersSavingsView : View
 
         UIContainer.SubscribeToView<ToggleView, bool>(_includedCancelled, (val) => AddCategory(val, StatusReservation.Cancelled));
         UIContainer.SubscribeToView<ToggleView, bool>(_includedBooked, (val) => AddCategory(val, StatusReservation.Booked));
+        UIContainer.SubscribeToView<ListView, VenueToggleView.Data>(_venuesToggles, VenueSelect);
+
+        UIContainer.SubscribeToView<DatePickerView, (string, string)>(_dateRange, CustomDateRange);
+    }
+
+    private void CustomDateRange((string, string) dates) 
+    {
+        _filters.FromDate = DateTime.Parse(dates.Item1);    
+        _filters.ToDate = DateTime.Parse(dates.Item2);    
+    }
+
+    private void VenueSelect(VenueToggleView.Data select) 
+    {
+        _filters.VenueId = select.Model.Id;
+        UIContainer.InitView(_venuesToggles, GenerateData((_data.VenueManager.GetAll())));
     }
 
     private void AddCategory(bool val, StatusReservation status) 
@@ -70,8 +85,8 @@ public class FiltersSavingsView : View
         if (val) _selectedDateRange = range;
         if (range == DateRanges.AllTime)
         {
-            _filters.FromDate = DateTime.MinValue;
-            _filters.ToDate = DateTime.MaxValue;
+            _filters.FromDate = null;
+            _filters.ToDate = null;
         }
         else if (range == DateRanges.Month) 
         {
@@ -92,7 +107,6 @@ public class FiltersSavingsView : View
         UpdateDateToggles();
         UpdateStatusToggles();
         UIContainer.InitView(_venuesToggles, GenerateData((_data.VenueManager.GetAll())));
-
     }
     private List<VenueToggleView.Data> GenerateData(List<VenueModel> venues)
     {

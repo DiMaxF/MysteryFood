@@ -5,20 +5,22 @@ using UnityEngine;
 public class OrdersScreen : AppScreen
 {
 
-    [SerializeField] private SearchView _searchView;
+    [SerializeField] private InputTextView _searchView;
     [SerializeField] private ToggleView _active;
     [SerializeField] private ToggleView _past;
     [SerializeField] private ToggleView _cancelled;
     [SerializeField] private ListView _list;
     [SerializeField] private ConfirmPanel _confirm;
     [SerializeField] private SelectVenueView _selectVenue;
-
+    [SerializeField] InputTextView searchView;
+    private string _searchData = "";
     private StatusReservation _showCategory = StatusReservation.Booked;
 
     protected override void OnStart()
     {
         base.OnStart();
         UIContainer.RegisterView(_confirm);
+        UIContainer.InitView(searchView, "");
     }
 
     protected override void Subscriptions()
@@ -30,13 +32,16 @@ public class OrdersScreen : AppScreen
         UIContainer.SubscribeToView<ToggleView, bool>(_active, val => SetCategory(StatusReservation.Booked));
         UIContainer.SubscribeToView<ToggleView, bool>(_past, val => SetCategory(StatusReservation.PickedUp));
         UIContainer.SubscribeToView<ToggleView, bool>(_cancelled, val => SetCategory(StatusReservation.Cancelled));
+        UIContainer.SubscribeToView<InputTextView, string>(searchView, OnSearchViewAction);
+
     }
 
     protected override void UpdateViews()
     {
         base.UpdateViews();
         UpdateToggles();
-        UIContainer.InitView(_list, Data.ReservationManager.GetSorted(_showCategory));
+        var list = _searchData == "" ? Data.ReservationManager.GetSorted(_showCategory) : Data.ReservationManager.SearchByVenues(_searchData, Data.ReservationManager.GetSorted(_showCategory));
+        UIContainer.InitView(_list, list);
     }
     private void SetCategory(StatusReservation category) 
     {
@@ -103,5 +108,9 @@ public class OrdersScreen : AppScreen
         }
         _selectVenue.Hide();
     }
-
+    private void OnSearchViewAction(string val)
+    {
+        _searchData = val;
+        UpdateViews();
+    }
 }

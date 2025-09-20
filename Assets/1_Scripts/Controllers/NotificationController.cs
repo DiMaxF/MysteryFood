@@ -1,5 +1,7 @@
-using UnityEngine;
 using Cysharp.Threading.Tasks;
+using System;
+using UnityEngine;
+using UnityEngine.Experimental.AI;
 
 public class NotificationController : MonoBehaviour
 {
@@ -10,8 +12,13 @@ public class NotificationController : MonoBehaviour
         _notificationManager = DataCore.Instance.NotificationManager;
         RebuildNotificationQueue(); 
     }
-
-    public async UniTask RequestNotificationPermission()
+    public void TestNotification()
+    {
+        var testNotification = new NotificationModel(UnityEngine.Random.Range(1000, 9999), "Test push", "The test push notification", DateTime.Now.AddSeconds(5));
+        _notificationManager.ScheduleNotification(testNotification);
+        Logger.Log($"Test notification created with ID {testNotification.Id}");
+    }
+    public async UniTask<bool> RequestNotificationPermission()
     {
         bool granted = await _notificationManager.RequestNotificationPermissionAsync();
         if (granted)
@@ -23,6 +30,7 @@ public class NotificationController : MonoBehaviour
         {
             Logger.LogWarning("Notification permission denied.");
         }
+        return granted;
     }
 
     public void CreateNotificationForReservation(ReservationModel reservation)

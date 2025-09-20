@@ -19,7 +19,13 @@ public class DatePickerView : View
     public override void Subscriptions()
     {
         base.Subscriptions();
-        calendar.OnRangeSelect += (start, end) => _date = (start?.ToString(DateTimeUtils.Format), end?.ToString(DateTimeUtils.Format));
+        calendar.OnRangeSelect += (start, end) => 
+        {
+            Logger.Log($"RANGE SET {start} {end}", "DatePickerView");
+
+            _date = (start?.ToString(DateTimeUtils.Format), end?.ToString(DateTimeUtils.Format));
+            TriggerAction(_date);
+        };
     }
 
 

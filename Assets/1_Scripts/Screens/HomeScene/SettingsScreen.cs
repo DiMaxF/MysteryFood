@@ -52,7 +52,7 @@ public class SettingsScreen : AppScreen
         UIContainer.InitView(_wastePerBage, Data.PersonalManager.WasteBag == 0 ? "" : Data.PersonalManager.WasteBag.ToString());
         UIContainer.InitView(_CO2Bage, Data.PersonalManager.CO2E == 0 ? "" : Data.PersonalManager.CO2E.ToString()); 
         _statusNotification.text = Data.PersonalManager.PermissionNotification ? "Notifications: Granted" : "Notifications: Denied";
-        if (!Data.PersonalManager.PermissionNotification) _openOS.Hide();
+        if (Data.PersonalManager.PermissionNotification) _openOS.Hide();
 
     }
 
@@ -129,12 +129,14 @@ public class SettingsScreen : AppScreen
 
     private void OnButtonTestNotification() 
     {
-        //_notificationController.Noti
+        _notificationController.TestNotification();
     }
 
-    private void OnButtonOpenOSNotification()
+    private async void OnButtonOpenOSNotification()
     {
-        _notificationController.RequestNotificationPermission().Forget();
+        var granted = await _notificationController.RequestNotificationPermission();
+        if(granted) _openOS.Hide();
+        _statusNotification.text = Data.PersonalManager.PermissionNotification ? "Notifications: Granted" : "Notifications: Denied";
     }
 
     private void OnButtonRestoreDefaults()

@@ -178,7 +178,7 @@ public class CalendarManager : MonoBehaviour
         {
             UpdateCalender(showYear, showMonth);
         }
-
+        Logger.Log("OnRangeSet", "CalendarManager");
         OnRangeSelect?.Invoke(_startDate, _endDate);
     }
 

@@ -80,9 +80,10 @@ public class DataCore : MonoBehaviour
             NotificationManager.RebuildNotificationQueue(); 
         }
     }
-    public async void RequestLocationPermission() 
+    public async UniTask<bool> RequestLocationPermission() 
     {
-        if (!await _location.CheckAndRequestPermissionAsync())
+        var result = await _location.CheckAndRequestPermissionAsync();
+        if (!result)
         {
             PersonalManager.PermissionLocation = false;
         }
@@ -91,7 +92,7 @@ public class DataCore : MonoBehaviour
             UpdateUserLocation();
             PersonalManager.PermissionLocation = true;
         }
-        
+        return result;
     }
 
     private async void UpdateUserLocation() 
@@ -109,7 +110,7 @@ public class DataCore : MonoBehaviour
         PersonalManager = new PersonalManager(_appData);
         SavingsTrackerManager = new SavingsTrackerManager(_appData);
         NotificationManager = new NotificationManager(_appData);
-        ReservationManager = new ReservationManager(_appData, NotificationManager);
+        ReservationManager = new ReservationManager(_appData, VenueManager, NotificationManager);
 
     }
 

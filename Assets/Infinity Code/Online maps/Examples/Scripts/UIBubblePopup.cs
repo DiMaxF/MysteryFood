@@ -33,7 +33,7 @@ namespace InfinityCode.OnlineMapsDemos
         /// Array of VenueModel data
         /// </summary>
         public VenueModel[] venues;
-
+        [SerializeField] private ButtonView _closeMap;
         /// <summary>
         /// Action to invoke when a venue is selected
         /// </summary>
@@ -103,6 +103,7 @@ namespace InfinityCode.OnlineMapsDemos
         /// </summary>
         private void Start()
         {
+            UIContainer.SubscribeToView(_closeMap, (object _) => OnMapClick());
             /* Subscribe to events of the map 
 
             OnlineMapsControlBase.instance.OnMapClick += OnMapClick;

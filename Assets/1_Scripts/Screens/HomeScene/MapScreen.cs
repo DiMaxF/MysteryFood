@@ -6,8 +6,10 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Threading;
 using UnityEditor;
+using UnityEditor.Search;
 using UnityEngine;
 using UnityEngine.Networking;
+using UnityEngine.UIElements;
 
 public class MapScreen : AppScreen
 {
@@ -17,6 +19,8 @@ public class MapScreen : AppScreen
     [SerializeField] private Canvas _canvasPopup;
     [SerializeField] private ButtonView _userLocation;
     [SerializeField] private BaseView _loading;
+    [SerializeField] InputTextView _searchView;
+
     [Header("Action")]
     [SerializeField] private ButtonView _reservation;
     [SerializeField] private ButtonView _openVenue;
@@ -31,6 +35,9 @@ public class MapScreen : AppScreen
     [SerializeField] private MapFiltersView _filters;
     private VenueModel _selectedVenue;
     private FilterOptions _filtersOptions = new FilterOptions();
+    private CancellationTokenSource _loadMapCts;
+    private string _searchData = "";
+
     protected override void OnStart()
     {
         base.OnStart();
@@ -41,23 +48,17 @@ public class MapScreen : AppScreen
             if (isFirstUpdate)
             {
                 _bubbles.UpdateMarkers(true);
-                isFirstUpdate = false; // Вызываем только один раз
+                isFirstUpdate = false; 
                 Logger.Log("MAP", "Map updated, markers created");
             }
         };
-        Container.OnScreenChanged += (screen) =>
-        {
-            if (!(screen is MapScreen))
-            {
-                _map.gameObject.SetActive(false);
-                _canvasPopup.gameObject.SetActive(false);
-            }
-        };  
+
         _bubbles.OnMapClick();
         _error.Hide();
         LoadMap();
-        
-        
+        UIContainer.InitView(_searchView, "");
+
+
     }
 
     protected override void UpdateViews()
@@ -66,23 +67,55 @@ public class MapScreen : AppScreen
         UIContainer.InitView(_filters, _filtersOptions);
     }
 
-    private async void LoadMap() 
+    private async void LoadMap(CancellationToken cancellationToken = default)
     {
-        _loading.Show();    
-        bool isConnected = await CheckInternetAsync();
-        if (isConnected)
+        _loading.Show();
+        try
         {
-            InitPoints(Data.VenueManager.GetVenuesWithCoordinates());
-            _map.gameObject.SetActive(true);
-            _canvasPopup.gameObject.SetActive(true);
-            CreateUserPoint();
-            _bubbles.OnMapClick();
+            bool isConnected = await CheckInternetAsync(cancellationToken);
+            if (isConnected)
+            {
+                DrawVenuesOnMap();
+                _map.gameObject.SetActive(true);
+                _canvasPopup.gameObject.SetActive(true);
+                CreateUserPoint();
+                _bubbles.OnMapClick();
+            }
+            else
+            {
+                _error.Show();
+            }
         }
-        else 
+        catch (OperationCanceledException)
         {
+            Logger.Log("MAP", "LoadMap was cancelled");
+            _error.Show(); 
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError($"LoadMap failed: {ex.Message}");
             _error.Show();
         }
-        _loading.Hide();
+        finally
+        {
+            _loading.Hide();
+        }
+    }
+    private void LoadMap()
+    {
+        CancelLoadMap(); 
+        _loadMapCts = new CancellationTokenSource();
+        LoadMap(_loadMapCts.Token);
+    }
+    public void CancelLoadMap()
+    {
+        if (_loadMapCts != null)
+        {
+            _loadMapCts.Cancel();
+            _loadMapCts.Dispose();
+            _loadMapCts = null;
+            Logger.Log("MAP", "LoadMap cancellation requested");
+        }
     }
 
     private void CreateUserPoint() 
@@ -134,6 +167,7 @@ public class MapScreen : AppScreen
         {
             Container.Show<HomeScreen>();
         });
+        UIContainer.SubscribeToView<InputTextView, string>(_searchView, OnSearchViewAction);
     }
 
     private void OpenFilters() 
@@ -143,11 +177,19 @@ public class MapScreen : AppScreen
 
     private void ApplyFilters(FilterOptions filters) 
     {
-        InitPoints(Data.VenueManager.GetFilteredVenues(filters, Data.PersonalManager));
+        _filtersOptions = filters;
+        DrawVenuesOnMap();
         CreateUserPoint();
         _filters.Hide();
         _bubbles.UpdateMarkers(true);
     }
+
+    private void OnSearchViewAction(string val)
+    {
+        _searchData = val;
+        DrawVenuesOnMap();
+    }
+
     private void OpenVenue() 
     {
         var screen = Container.GetScreen<VenueScreen>();
@@ -160,6 +202,22 @@ public class MapScreen : AppScreen
         var screen = Container.GetScreen<AddReservationScreen>();
         screen.SetVenue(_selectedVenue);
         Container.Show(screen);
+    }
+
+    private async void DrawVenuesOnMap() 
+    {
+        if (_filtersOptions != new FilterOptions())
+        {
+            var list = _searchData == "" ? Data.VenueManager.GetFilteredVenues(_filtersOptions, Data.PersonalManager) : Data.VenueManager.SearchAdresses(_searchData, Data.VenueManager.GetFilteredVenues(_filtersOptions, Data.PersonalManager));
+            InitPoints(list);
+        }
+        else 
+        {
+            var list = _searchData == "" ? Data.VenueManager.GetVenuesWithCoordinates() : Data.VenueManager.SearchAdresses(_searchData, Data.VenueManager.GetVenuesWithCoordinates());
+            InitPoints(list);
+        }
+        await UniTask.WaitForSeconds(0.3f);
+        _bubbles.UpdateMarkers(true);
     }
 
     private void OpenDirections() 

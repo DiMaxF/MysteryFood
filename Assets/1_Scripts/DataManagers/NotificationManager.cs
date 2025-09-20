@@ -135,7 +135,7 @@ public class NotificationManager
             .ToList();
     }
 
-    private void ScheduleNotification(NotificationModel notification)
+    public void ScheduleNotification(NotificationModel notification)
     {
         if (notification.FireTime <= DateTime.Now)
         {

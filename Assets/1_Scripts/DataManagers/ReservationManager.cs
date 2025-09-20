@@ -9,14 +9,16 @@ public class ReservationManager : IDataManager
 {
     private readonly AppData _appData;
     private NotificationManager _notification;
+    private VenueManager _venueManager;
     private int _index
     {
         set => PlayerPrefs.SetInt("ReservationIndex", value);
         get => PlayerPrefs.GetInt("ReservationIndex", 0);
     }
-    public ReservationManager(AppData appData, NotificationManager notification)
+    public ReservationManager(AppData appData, VenueManager venueManager, NotificationManager notification)
     {
         _notification = notification;
+        _venueManager = venueManager;
         _appData = appData ?? throw new ArgumentNullException(nameof(appData));
     }
 
@@ -38,6 +40,17 @@ public class ReservationManager : IDataManager
         return GetAll().Where(r => r.Status == status).ToList();
     }
 
+
+    public List<ReservationModel> SearchByVenues(string searchData, List<ReservationModel> listToSort)
+    {
+        return listToSort.Where(r =>
+        {
+            var venue = _venueManager.GetById(r.VenueId);
+            return venue != null &&
+                   (venue.Name.Contains(searchData, StringComparison.OrdinalIgnoreCase) ||
+                    r.Id.ToString().Contains(searchData));
+        }).ToList();
+    }
     public List<ReservationModel> GetAll() 
     {
         return _appData.Reservations;

@@ -30,6 +30,17 @@ public class VenueManager : IDataManager
     }
     public List<VenueModel> GetAll() => _appData.Venues;
 
+    public List<VenueModel> SearchVenues(string searchData, List<VenueModel> list) 
+    {
+        var result = list.Where(v => v.Id.ToString().Contains(searchData) || v.Name.Contains(searchData));
+        return result.ToList(); 
+    }
+
+    public List<VenueModel> SearchAdresses(string searchData, List<VenueModel> list) 
+    {
+        return list.Where(v =>v.Name.Contains(searchData) || v.Location.Address.Contains(searchData)).ToList();
+    }
+
     public void AddVenue(VenueModel venue) 
     {
         venue.Id = _index;

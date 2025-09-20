@@ -6,7 +6,7 @@ using UnityEngine.UI;
 
 public class HomeScreen : AppScreen
 {
-    [SerializeField] SearchView searchView;
+    [SerializeField] InputTextView searchView;
     [SerializeField] ListView venues;
     [SerializeField] ButtonView hintDistance;
     [SerializeField] ButtonView addReservation;
@@ -14,7 +14,7 @@ public class HomeScreen : AppScreen
     [SerializeField] ButtonView savings;
 
     [SerializeField] private SelectVenueView _selectVenue;
-
+    private string _searchData = "";
     protected override void OnStart()
     {
         base.OnStart();
@@ -26,6 +26,7 @@ public class HomeScreen : AppScreen
         {
             hintDistance.Show();
         }
+        UIContainer.InitView(searchView, "");
     }
 
     protected override void Subscriptions()
@@ -40,19 +41,25 @@ public class HomeScreen : AppScreen
         UIContainer.SubscribeToView<ButtonView, object>(hintDistance, _ => RequestLocationPermission() );
         //UIContainer.SubscribeToView<ButtonView, object>(_noVenues, _ => OnButtonAddVenue());
         UIContainer.SubscribeToView<ListView, VenueModel>(venues, OnVenueAction);
-    }
-
-    private void RequestLocationPermission() 
-    {
-        Data.RequestLocationPermission();
-        hintDistance.Hide();
+        UIContainer.SubscribeToView<InputTextView, string>(searchView, OnSearchViewAction);
     }
 
     protected override void UpdateViews()
     {
         base.UpdateViews();
-        UIContainer.InitView(venues, Data.VenueManager.GetAll());
+        var list = _searchData == "" ? Data.VenueManager.GetAll() : Data.VenueManager.SearchVenues(_searchData, Data.VenueManager.GetAll());  
+        UIContainer.InitView(venues, list);
     }
+
+    private async void RequestLocationPermission() 
+    {
+        var result = await Data.RequestLocationPermission();
+        if(result) hintDistance.Hide();
+        else hintDistance.Show();
+        //hintDistance.Hide();
+    }
+
+
     private void OnButtonAddVenue()
     {
         var screen = Container.GetScreen<AddVenueScreen>();
@@ -98,5 +105,11 @@ public class HomeScreen : AppScreen
         screen.SetModel(model);
         Container.Show(screen);
 
+    }
+
+    private void OnSearchViewAction(string val) 
+    {
+        _searchData = val;  
+        UpdateViews();
     }
 }
