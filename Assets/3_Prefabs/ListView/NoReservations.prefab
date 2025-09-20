@@ -272,7 +272,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 2055360293007343234, guid: d8efbcc4227e06c4daea345a03e8e9a1, type: 3}
       propertyPath: m_Text
-      value: No reservations yet
+      value: No reservations found
       objectReference: {fileID: 0}
     - target: {fileID: 2797799906663143438, guid: d8efbcc4227e06c4daea345a03e8e9a1, type: 3}
       propertyPath: m_Name

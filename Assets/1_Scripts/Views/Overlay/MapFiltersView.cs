@@ -46,11 +46,17 @@ public class MapFiltersView : View
 
         UIContainer.SubscribeToView<ButtonView, object>(_applyFilters, _ => TriggerAction(_filters));
         UIContainer.SubscribeToView<ButtonView, object>(_close, _ => Hide());
+        UIContainer.SubscribeToView<ButtonView, object>(_reset, _ => ResetFilters());
 
         UIContainer.SubscribeToView<ToggleView, bool>(_pickupNow, NowToggle);
         UIContainer.SubscribeToView<InputTextView, string>(_minPrice, ChangeMinPrice);
         UIContainer.SubscribeToView<InputTextView, string>(_maxPrice, ChangMaxPrice);
         UIContainer.SubscribeToView<SliderView, float>(_distance, ChangeDistance);
+    }
+
+    private void ResetFilters() 
+    {
+        Init(new FilterOptions());
     }
     private void NowToggle(bool val)
     {

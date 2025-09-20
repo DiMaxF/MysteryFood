@@ -155,4 +155,40 @@ public class SavingsTrackerManager : IDataManager
             .Take(count)
             .ToList();
     }
+
+    /// <summary>
+    /// Возвращает общую потраченную сумму за указанный месяц.
+    /// </summary>
+    /// <param name="year">Год для фильтрации.</param>
+    /// <param name="month">Месяц для фильтрации (1-12).</param>
+    /// <returns>Общая потраченная сумма (на основе DiscountedPrice).</returns>
+    public float GetTotalSpentForMonth(int year, int month)
+    {
+        var filtered = GetFilteredReservations()
+            .Where(r =>
+            {
+                DateTime createdAt = DateTime.ParseExact(r.CreatedAt, DateTimeUtils.Full, CultureInfo.InvariantCulture);
+                return createdAt.Year == year && createdAt.Month == month;
+            });
+
+        return filtered.Sum(r => r.OriginalPrice.Amount * r.Quantity);
+    }
+
+    /// <summary>
+    /// Возвращает общую сэкономленную сумму за указанный месяц.
+    /// </summary>
+    /// <param name="year">Год для фильтрации.</param>
+    /// <param name="month">Месяц для фильтрации (1-12).</param>
+    /// <returns>Общая сэкономленная сумма (разница между OriginalPrice и DiscountedPrice).</returns>
+    public float GetTotalSavedForMonth(int year, int month)
+    {
+        var filtered = GetFilteredReservations()
+            .Where(r =>
+            {
+                DateTime createdAt = DateTime.ParseExact(r.CreatedAt, DateTimeUtils.Full, CultureInfo.InvariantCulture);
+                return createdAt.Year == year && createdAt.Month == month;
+            });
+
+        return filtered.Sum(r => (r.OriginalPrice.Amount - r.DiscountedPrice.Amount) * r.Quantity);
+    }
 }

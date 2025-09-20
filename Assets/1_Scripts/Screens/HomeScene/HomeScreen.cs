@@ -1,4 +1,5 @@
 using Cysharp.Threading.Tasks;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -12,6 +13,8 @@ public class HomeScreen : AppScreen
     [SerializeField] ButtonView addReservation;
     [SerializeField] ButtonView addVenue;
     [SerializeField] ButtonView savings;
+    [SerializeField] Slider savedMoney;
+    [SerializeField] Text savedMoneyValue;
 
     [SerializeField] private SelectVenueView _selectVenue;
     private string _searchData = "";
@@ -27,6 +30,12 @@ public class HomeScreen : AppScreen
             hintDistance.Show();
         }
         UIContainer.InitView(searchView, "");
+        savedMoney.maxValue =  Data.SavingsTrackerManager.GetTotalSpentForMonth(DateTime.Now.Year, DateTime.Now.Month);
+        var savedVal = Data.SavingsTrackerManager.GetTotalSavedForMonth(DateTime.Now.Year, DateTime.Now.Month);
+        savedMoney.value = savedVal;
+        Logger.Log($"{Data.SavingsTrackerManager.GetTotalSpentForMonth(DateTime.Now.Year, DateTime.Now.Month)} {savedVal}");
+
+        savedMoneyValue.text = $"{savedVal}{Data.PersonalManager.Currency}";
     }
 
     protected override void Subscriptions()

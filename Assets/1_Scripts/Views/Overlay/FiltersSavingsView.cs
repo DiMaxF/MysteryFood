@@ -47,6 +47,7 @@ public class FiltersSavingsView : View
 
         UIContainer.SubscribeToView<ButtonView, object>(_applyFilters, _ => TriggerAction(_filters));
         UIContainer.SubscribeToView<ButtonView, object>(_close, _ => Hide());
+        UIContainer.SubscribeToView<ButtonView, object>(_reset, _ => ResetFilters());
 
         UIContainer.SubscribeToView<ToggleView, bool>(_allTime, (val) => SetDateRange(val, DateRanges.AllTime));
         UIContainer.SubscribeToView<ToggleView, bool>(_month, (val) => SetDateRange(val, DateRanges.Month));
@@ -60,7 +61,10 @@ public class FiltersSavingsView : View
 
         UIContainer.SubscribeToView<DatePickerView, (string, string)>(_dateRange, CustomDateRange);
     }
-
+    private void ResetFilters()
+    {
+        Init(new FilterOptions());
+    }
     private void CustomDateRange((string, string) dates) 
     {
         _filters.FromDate = DateTime.Parse(dates.Item1);    
