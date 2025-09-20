@@ -11,8 +11,8 @@ public class Logger
         Error,
         Warning
     }
-    const bool active = true;
-    const string TAG = "EventTicketPro";
+    const bool active = false;
+    const string TAG = "MysteryFood";
 
     public static void TryCatch(Action action)
     {

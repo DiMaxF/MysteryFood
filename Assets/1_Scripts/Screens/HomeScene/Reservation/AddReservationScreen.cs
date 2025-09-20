@@ -63,7 +63,8 @@ public class AddReservationScreen : AppScreen
 
         if (Data.PersonalManager.PermissionLocation)
         {
-            _distance.text = $"{Data.PersonalManager.CalculateDistance(_venueModel.Location):F2} km";  
+            if(_venueModel.Location.Latitude != 0)  _distance.text = $"{Data.PersonalManager.CalculateDistance(_venueModel.Location):F2} km";
+            else _distance.text = "—";
         }
         else 
         {
@@ -245,13 +246,13 @@ public class AddReservationScreen : AppScreen
         {
             return InputError(_originalPrice);
         }
-        if (_discountedPrice.text == "" || !int.TryParse(_originalPrice.text, out var disPrice))
+        if (_discountedPrice.text == "" || !int.TryParse(_discountedPrice.text, out var disPrice))
         {
-            return InputError(_originalPrice);
+            return InputError(_discountedPrice);
         }
         if (orPrice < disPrice) 
         {
-            InputError(_originalPrice);
+            InputError(_discountedPrice);
             return InputError(_originalPrice);
         }
         _confirm.interactable = true;

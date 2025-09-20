@@ -6,7 +6,6 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Threading;
 using UnityEditor;
-using UnityEditor.Search;
 using UnityEngine;
 using UnityEngine.Networking;
 using UnityEngine.UIElements;
@@ -66,16 +65,17 @@ public class MapScreen : AppScreen
         base.UpdateViews();
         UIContainer.InitView(_filters, _filtersOptions);
     }
-
     private async void LoadMap(CancellationToken cancellationToken = default)
     {
         _loading.Show();
         try
         {
             bool isConnected = await CheckInternetAsync(cancellationToken);
+            cancellationToken.ThrowIfCancellationRequested(); // Проверяем отмену после CheckInternetAsync
             if (isConnected)
             {
                 DrawVenuesOnMap();
+                cancellationToken.ThrowIfCancellationRequested(); // Проверяем перед активацией карты
                 _map.gameObject.SetActive(true);
                 _canvasPopup.gameObject.SetActive(true);
                 CreateUserPoint();
@@ -89,7 +89,7 @@ public class MapScreen : AppScreen
         catch (OperationCanceledException)
         {
             Logger.Log("MAP", "LoadMap was cancelled");
-            _error.Show(); 
+            _error.Show();
         }
         catch (Exception ex)
         {
@@ -146,6 +146,7 @@ public class MapScreen : AppScreen
     {
         _map.gameObject.SetActive(false);
         _canvasPopup.gameObject.SetActive(false);
+        CancelLoadMap();
     }
 
     protected override void Subscriptions()

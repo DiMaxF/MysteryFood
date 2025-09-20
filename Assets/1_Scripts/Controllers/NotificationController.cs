@@ -14,7 +14,7 @@ public class NotificationController : MonoBehaviour
     }
     public void TestNotification()
     {
-        var testNotification = new NotificationModel(UnityEngine.Random.Range(1000, 9999), "Test push", "The test push notification", DateTime.Now.AddSeconds(5));
+        var testNotification = new NotificationModel(UnityEngine.Random.Range(1000, 9999), "Test push", "The test push notification", DateTime.Now.AddSeconds(10));
         _notificationManager.ScheduleNotification(testNotification);
         Logger.Log($"Test notification created with ID {testNotification.Id}");
     }

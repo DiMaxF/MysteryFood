@@ -70,7 +70,7 @@ public class VenueScreen : AppScreen
 
     private void OnButtonBack()
     {
-        Container.Back().Forget();
+        Container.Show<HomeScreen>();
     }
 
     private void OnButtonDialer() 

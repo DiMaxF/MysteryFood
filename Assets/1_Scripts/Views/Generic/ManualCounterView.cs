@@ -32,7 +32,7 @@ public class ManualCounterView : View
     {
         base.UpdateUI();
         _value.text = _counter.ToString();  
-        _minus.canvasGroup.enabled = _counter > 0;
+        _minus.canvasGroup.interactable = _counter > 0;
     }
 
     private void AddCount(int value) 

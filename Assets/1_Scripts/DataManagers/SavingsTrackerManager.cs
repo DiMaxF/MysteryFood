@@ -23,7 +23,7 @@ public class SavingsTrackerManager : IDataManager
         _filters = null;
     }
 
-    private List<ReservationModel> GetFilteredReservations()
+    public List<ReservationModel> GetFilteredReservations()
     {
         var reservations = _appData.Reservations;
 
@@ -164,7 +164,7 @@ public class SavingsTrackerManager : IDataManager
     /// <returns>Общая потраченная сумма (на основе DiscountedPrice).</returns>
     public float GetTotalSpentForMonth(int year, int month)
     {
-        var filtered = GetFilteredReservations()
+        var filtered = _appData.Reservations
             .Where(r =>
             {
                 DateTime createdAt = DateTime.ParseExact(r.CreatedAt, DateTimeUtils.Full, CultureInfo.InvariantCulture);
@@ -182,7 +182,7 @@ public class SavingsTrackerManager : IDataManager
     /// <returns>Общая сэкономленная сумма (разница между OriginalPrice и DiscountedPrice).</returns>
     public float GetTotalSavedForMonth(int year, int month)
     {
-        var filtered = GetFilteredReservations()
+        var filtered = _appData.Reservations
             .Where(r =>
             {
                 DateTime createdAt = DateTime.ParseExact(r.CreatedAt, DateTimeUtils.Full, CultureInfo.InvariantCulture);
