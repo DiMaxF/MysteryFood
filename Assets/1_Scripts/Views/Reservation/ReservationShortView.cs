@@ -11,6 +11,7 @@ public class ReservationShortView : View
     [SerializeField] private Text _reservationTime;
     [SerializeField] private Text _quantity;
     [SerializeField] private Text _totalPrice;
+    [SerializeField] private BaseView _contentToHide;
 
     private ReservationModel _model;
     private DataCore _data => DataCore.Instance;
@@ -28,10 +29,21 @@ public class ReservationShortView : View
         if (venue == null) return;
         UIContainer.InitView(_image, venue.ImagePath);
         _venueName.text = venue.Name;
+
         _reservationId.text = $"ID-{_model.Id}";
-        _reservationTime.text = $"{_model.StartTime}-{_model.EndTime} PM";
-        _quantity.text = $"x{_model.Quantity}";
-        _totalPrice.text = $"{_model.DiscountedPrice.Amount * _model.Quantity} {_model.DiscountedPrice.Currency}";
+        if (_model.Status == StatusReservation.Cancelled)
+        {
+            _contentToHide.Hide();
+            _venueName.text = "Deleted";
+            _venueName.color = Color.red;
+        }
+        else 
+        {
+            _reservationTime.text = $"{_model.StartTime}-{_model.EndTime} PM";
+            _quantity.text = $"x{_model.Quantity}";
+            _totalPrice.text = $"{_model.DiscountedPrice.Amount * _model.Quantity} {_model.DiscountedPrice.Currency}";
+        }
+
     }
     
 }

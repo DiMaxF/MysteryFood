@@ -3,9 +3,11 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using Unity.Notifications;
 using Unity.Notifications.Android;
 using UnityEngine;
+using UnityEngine.Android;
 
 public class NotificationManager
 {
@@ -26,20 +28,36 @@ public class NotificationManager
 #endif
     }
 
-    public async UniTask<bool> RequestNotificationPermissionAsync()
+    public async UniTask<bool> RequestNotificationPermissionAsync(CancellationToken cancellationToken = default)
     {
 #if UNITY_IOS
+    var currentStatus = iOSNotificationCenter.GetAuthorizationStatus();
+    if (currentStatus != AuthorizationStatus.Authorized)
+    {
         var result = await iOSNotificationCenter.RequestAuthorizationAsync(
-            iOSNotificationCenter.AuthorizationOption.Alert |
-            iOSNotificationCenter.AuthorizationOption.Badge |
-            iOSNotificationCenter.AuthorizationOption.Sound);
+            AuthorizationOption.Alert | AuthorizationOption.Badge | AuthorizationOption.Sound,
+            cancellationToken: cancellationToken);
 
         _appData.PermissionNotification = result;
-        return result;
-#elif UNITY_ANDROID
-        _appData.PermissionNotification = true;
-        return true;
+        return result && !cancellationToken.IsCancellationRequested;
+    }
+    _appData.PermissionNotification = true;
+    return true;
+#elif UNITY_ANDROID 
+    if (!Permission.HasUserAuthorizedPermission("android.permission.POST_NOTIFICATIONS"))
+    {
+        Permission.RequestUserPermission("android.permission.POST_NOTIFICATIONS");
+        await UniTask.WaitUntil(
+            () => Permission.HasUserAuthorizedPermission("android.permission.POST_NOTIFICATIONS") || cancellationToken.IsCancellationRequested,
+            cancellationToken: cancellationToken);
+        
+        _appData.PermissionNotification = Permission.HasUserAuthorizedPermission("android.permission.POST_NOTIFICATIONS");
+        return _appData.PermissionNotification && !cancellationToken.IsCancellationRequested;
+    }
+    _appData.PermissionNotification = true;
+    return true;
 #else
+        _appData.PermissionNotification = false;
         return false;
 #endif
     }
@@ -167,6 +185,5 @@ public class NotificationManager
             CancelNotification(notification.Id);
         }
         _appData.Notifications.Clear();
-        DataCore.Instance.SaveData();
     }
 }

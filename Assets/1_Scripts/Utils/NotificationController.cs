@@ -5,7 +5,7 @@ public class NotificationController : MonoBehaviour
 {
     private NotificationManager _notificationManager;
 
-    private void Awake()
+    private void Start()
     {
         _notificationManager = DataCore.Instance.NotificationManager;
         RebuildNotificationQueue(); 

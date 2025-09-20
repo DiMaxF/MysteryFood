@@ -1,9 +1,12 @@
+using Cysharp.Threading.Tasks;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class SettingsScreen : AppScreen
 {
+    [SerializeField] private NotificationController _notificationController;
     [Header("Currency")]
     [SerializeField] private ToggleView _egp;
     [SerializeField] private ToggleView _eur;
@@ -16,6 +19,7 @@ public class SettingsScreen : AppScreen
     [SerializeField] private ToggleView _60min;
     [SerializeField] private ButtonView _testNotification;
     [SerializeField] private ButtonView _openOS;
+    [SerializeField] private Text _statusNotification;
 
     [Header("Environmental Factors")]
     [SerializeField] private InputTextView _wastePerBage;
@@ -45,8 +49,11 @@ public class SettingsScreen : AppScreen
         base.UpdateViews();
         UpdateNotificationsToggles();
         UpdateCurrencyToggles();
-        UIContainer.InitView(_wastePerBage, Data.PersonalManager.WasteBag.ToString());
-        UIContainer.InitView(_CO2Bage, Data.PersonalManager.CO2E.ToString());
+        UIContainer.InitView(_wastePerBage, Data.PersonalManager.WasteBag == 0 ? "" : Data.PersonalManager.WasteBag.ToString());
+        UIContainer.InitView(_CO2Bage, Data.PersonalManager.CO2E == 0 ? "" : Data.PersonalManager.CO2E.ToString()); 
+        _statusNotification.text = Data.PersonalManager.PermissionNotification ? "Notifications: Granted" : "Notifications: Denied";
+        if (!Data.PersonalManager.PermissionNotification) _openOS.Hide();
+
     }
 
     protected override void Subscriptions()
@@ -122,12 +129,12 @@ public class SettingsScreen : AppScreen
 
     private void OnButtonTestNotification() 
     {
-
+        //_notificationController.Noti
     }
 
     private void OnButtonOpenOSNotification()
     {
-
+        _notificationController.RequestNotificationPermission().Forget();
     }
 
     private void OnButtonRestoreDefaults()

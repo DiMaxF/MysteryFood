@@ -62,6 +62,7 @@ namespace InfinityCode.OnlineMapsDemos
         /// <param name="marker">The marker on which clicked</param>
         private void OnMarkerClick(OnlineMapsMarkerBase marker)
         {
+            Logger.Log("MARKER", "MARKER");
             // Set active marker reference
             targetMarker = marker as OnlineMapsMarker;
 
@@ -78,8 +79,6 @@ namespace InfinityCode.OnlineMapsDemos
             // Invoke the OnVenueSelected action with the selected venue
             OnVenueSelected?.Invoke(venue);
 
-            // Update popup position
-            UpdateBubblePosition();
         }
         public void CreatePoint(GeoPoint point)
         {
@@ -104,20 +103,12 @@ namespace InfinityCode.OnlineMapsDemos
         /// </summary>
         private void Start()
         {
-            // Subscribe to events of the map 
-            OnlineMaps.instance.OnChangePosition += UpdateBubblePosition;
-            OnlineMaps.instance.OnChangeZoom += UpdateBubblePosition;
+            /* Subscribe to events of the map 
+
             OnlineMapsControlBase.instance.OnMapClick += OnMapClick;
 
-            if (OnlineMapsControlBaseDynamicMesh.instance != null)
-            {
-                OnlineMapsControlBaseDynamicMesh.instance.OnMeshUpdated += UpdateBubblePosition;
-            }
 
-            if (OnlineMapsCameraOrbit.instance != null)
-            {
-                OnlineMapsCameraOrbit.instance.OnCameraControl += UpdateBubblePosition;
-            }
+
 
             if (venues != null)
             {
@@ -130,60 +121,26 @@ namespace InfinityCode.OnlineMapsDemos
             }
 
             // Initially hide popup
-            bubble.SetActive(false);
+            bubble.SetActive(false);*/
+            UpdateMarkers(true);
         }
 
-        /// <summary>
-        /// Updates the popup position
-        /// </summary>
-        private void UpdateBubblePosition()
-        {
-            /*if (targetMarker == null) return;
-
-            // Hide the popup if the marker is outside the map view
-            if (!targetMarker.inMapView)
-            {
-                if (bubble.activeSelf) bubble.SetActive(false);
-            }
-            else if (!bubble.activeSelf)
-            {
-                bubble.SetActive(true);
-            }
-
-            // Convert the coordinates of the marker to the screen position
-            Vector2 screenPosition = OnlineMapsControlBase.instance.GetScreenPosition(targetMarker.position);
-
-            // Add marker height
-            screenPosition.y += targetMarker.height;
-
-            // Get a local position inside the canvas
-            Vector2 point;
-            RectTransformUtility.ScreenPointToLocalPointInRectangle(canvas.transform as RectTransform, screenPosition, null, out point);
-
-            // Set local position of the popup
-            (bubble.transform as RectTransform).localPosition = point;*/
-        }
-    
     public void UpdateMarkers(bool preserveUserMarker = true)
         {
-            // Save user marker if needed
             OnlineMapsMarker savedUserMarker = preserveUserMarker ? userMarker : null;
 
-            // Clear all markers
             OnlineMapsMarkerManager.RemoveAllItems();
 
-            // Restore user marker if preserved
             if (savedUserMarker != null)
             {
                 OnlineMapsMarkerManager.AddItem(savedUserMarker);
             }
 
-            // Create new markers for venues
             if (venues != null)
             {
                 foreach (VenueModel venue in venues)
                 {
-                    if (venue?.Location != null) // Проверка на null
+                    if (venue?.Location != null)
                     {
                         OnlineMapsMarker marker = OnlineMapsMarkerManager.CreateItem(venue.Location.Longitude, venue.Location.Latitude);
                         marker["data"] = venue;
@@ -192,11 +149,7 @@ namespace InfinityCode.OnlineMapsDemos
                 }
             }
 
-            // Update bubble position if a venue is selected
-            if (targetMarker != null && bubble.activeSelf)
-            {
-                UpdateBubblePosition();
-            }
+            bubble.SetActive(false);
         }
     }
 }

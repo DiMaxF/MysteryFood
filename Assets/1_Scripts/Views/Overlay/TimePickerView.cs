@@ -27,8 +27,8 @@ public class TimePickerView : View
             _minutes = _time.Minutes;
             UIContainer.RegisterView(hours);
             UIContainer.RegisterView(minutes);
-            UIContainer.InitView(hours, _time.Hours.ToString());
-            UIContainer.InitView(minutes, _time.Minutes.ToString());
+            UIContainer.InitView(hours, _time.Hours == 0 ? "" : _time.Hours.ToString());
+            UIContainer.InitView(minutes, _time.Minutes == 0 ? "" : _time.Minutes.ToString());
 
         }
         base.Init(data);

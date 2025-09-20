@@ -44,7 +44,7 @@ public class OrderDetailsScreen : AppScreen
         _name.text = venue.Name;
         _quantity.text = $"x{_model.Quantity}";
         _location.text = venue.Location.Address;
-        UIContainer.InitView(_phone, venue.Phone);
+        UIContainer.InitView(_phone, venue.Phone.ToString());
         UIContainer.InitView(_image, venue.ImagePath);
         UIContainer.InitView(_status, _model.Status);
         _totalPrice.text = _model.DiscountedPrice.ToString();

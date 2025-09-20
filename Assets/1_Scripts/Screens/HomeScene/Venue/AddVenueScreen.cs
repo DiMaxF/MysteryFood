@@ -63,7 +63,6 @@ public class AddVenueScreen : AppScreen
         UIContainer.SubscribeToView<ButtonView, object>(_timeEnd, _ => OnButtonTimeEnd());
 
         UIContainer.SubscribeToView<InputTextView, string>(_name, OnNameEdit);
-        UIContainer.SubscribeToView<InputTextView, string>(_description, OnNameEdit);
         UIContainer.SubscribeToView<InputTextView, string>(_phone, OnPhoneEdit);
         UIContainer.SubscribeToView<InputTextView, string>(_price, OnPriceEdit);
         UIContainer.SubscribeToView<InputTextView, string>(_address, OnAddressEdit);
@@ -154,13 +153,11 @@ public class AddVenueScreen : AppScreen
     private void OnDescriptionEdit(string val)
     {
         _model.Description = val;
-        ValidateModel();
     }
 
     private void OnIngredientsAllergensEdit(string val)
     {
         _model.IngredientsAllergens = val;
-        ValidateModel();
     }
 
     private void OnNameEdit(string val)

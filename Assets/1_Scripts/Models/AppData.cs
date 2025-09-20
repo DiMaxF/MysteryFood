@@ -9,7 +9,7 @@ public class AppData
     public List<VenueModel> Venues;
     public List<ReservationModel> Reservations;
     public Currency Currency;
-    public int Notification;
+    public int Notification = 10;
     public float WasteBag;
     public float CO2E;
     public bool PermissionLocation;

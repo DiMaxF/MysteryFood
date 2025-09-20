@@ -71,6 +71,7 @@ public class AddReservationScreen : AppScreen
         }
         UIContainer.InitView(_timeStartInput, _venueModel.StartTime);
         UIContainer.InitView(_timeEndInput, _venueModel.EndTime);
+        _model.OriginalPrice = _venueModel.Price;   
     }
 
     protected override void Subscriptions()
@@ -104,7 +105,8 @@ public class AddReservationScreen : AppScreen
         UIContainer.InitView(_timeEndInput, _model.EndTime);
 
         UIContainer.InitView(_discountedPrice, _model.DiscountedPrice.Amount == 0 ? "" : _model.DiscountedPrice.ToString());
-        UIContainer.InitView(_originalPrice, _model.OriginalPrice.Amount == 0 ? "" : _model.OriginalPrice.ToString());
+        if (_venueModel.Price.Amount != 0) UIContainer.InitView(_originalPrice, _venueModel.Price.Amount.ToString());
+        else UIContainer.InitView(_originalPrice, _model.OriginalPrice.Amount == 0 ? "" : _model.OriginalPrice.ToString());
         UIContainer.InitView(_notes, _model.Notes);
 
     }

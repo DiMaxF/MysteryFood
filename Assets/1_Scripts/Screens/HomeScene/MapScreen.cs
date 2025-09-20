@@ -34,10 +34,35 @@ public class MapScreen : AppScreen
     protected override void OnStart()
     {
         base.OnStart();
-
+        UIContainer.RegisterView(_filters);
+        bool isFirstUpdate = true;
+        _map.OnMapUpdated += () =>
+        {
+            if (isFirstUpdate)
+            {
+                _bubbles.UpdateMarkers(true);
+                isFirstUpdate = false; // Вызываем только один раз
+                Logger.Log("MAP", "Map updated, markers created");
+            }
+        };
+        Container.OnScreenChanged += (screen) =>
+        {
+            if (!(screen is MapScreen))
+            {
+                _map.gameObject.SetActive(false);
+                _canvasPopup.gameObject.SetActive(false);
+            }
+        };  
         _bubbles.OnMapClick();
         _error.Hide();
         LoadMap();
+        
+        
+    }
+
+    protected override void UpdateViews()
+    {
+        base.UpdateViews();
         UIContainer.InitView(_filters, _filtersOptions);
     }
 

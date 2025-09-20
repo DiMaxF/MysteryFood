@@ -33,7 +33,6 @@ public class QrReservationScreen : AppScreen
     {
         base.Subscriptions();
         UIContainer.SubscribeToView(_back, (object _) => OnButtonBack());
-        UIContainer.SubscribeToView<ConfirmPanel, bool>(_confirm, ConfirmExit);
         UIContainer.SubscribeToView(_fullInfo, (object _) => OnButtonFullInfo());
         UIContainer.SubscribeToView(_markedAsPickedUp, (object _) => OnButtonMarked());
 
@@ -41,12 +40,25 @@ public class QrReservationScreen : AppScreen
 
     private void ConfirmExit(bool val) 
     {
-        if (val) Container.Back().Forget();
+        if (val) Container.Show<HomeScreen>();
         _confirm.Hide();
     }
-
+    private void ConfirmPickedUpt(bool val)
+    {
+        if (val) 
+        {
+            _model.Status = StatusReservation.PickedUp;
+            Data.ReservationManager.Update(_model);
+            Data.SaveData();
+            UpdateViews();
+        }
+        
+        _confirm.Hide();
+    }
     private void OnButtonBack()
     {
+        UIContainer.UnsubscribeFromView(_confirm);   
+        UIContainer.SubscribeToView<ConfirmPanel, bool>(_confirm, ConfirmExit);
         UIContainer.InitView(_confirm, "Outside pickup window. Confirm?");
         _confirm.Show();
     }
@@ -60,8 +72,9 @@ public class QrReservationScreen : AppScreen
 
     private void OnButtonMarked()
     {
-        _model.Status = StatusReservation.PickedUp;
-        Data.ReservationManager.Update(_model);
-        Data.SaveData();
+        UIContainer.UnsubscribeFromView(_confirm);
+        UIContainer.SubscribeToView<ConfirmPanel, bool>(_confirm, ConfirmPickedUpt);
+        UIContainer.InitView(_confirm, "Mark reservation as picked up?");
+        _confirm.Show();
     }
 }

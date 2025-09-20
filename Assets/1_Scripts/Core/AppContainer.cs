@@ -14,7 +14,7 @@ public class AppContainer : MonoBehaviour
     [SerializeField] NavigationBarView navigationBar;
     [SerializeField] List<NavigationButtonData> _data;
     [SerializeField] List<AppScreen> hideNavigationBar = new List<AppScreen>();
-
+    public Action<AppScreen> OnScreenChanged;
     private DataCore core => DataCore.Instance;
     private AppScreen _openedScreen;
     public AppScreen OpenedScreen => _openedScreen;
@@ -91,6 +91,7 @@ public class AppContainer : MonoBehaviour
 
         var previousScreen = _history.Pop();
         Show(previousScreen);
+        OnScreenChanged?.Invoke(previousScreen);    
     }
 
     public AppScreen FindScreen(string name) =>

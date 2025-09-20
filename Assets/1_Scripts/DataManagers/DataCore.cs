@@ -43,7 +43,7 @@ public class DataCore : MonoBehaviour
         set => PlayerPrefs.SetInt("FirstEnter", value ? 1 : 0); 
     }
 
-    private const string AppDataFileName = "dsdsd.json";
+    private const string AppDataFileName = "dddddddd.json";
 
     private void Awake()
     {

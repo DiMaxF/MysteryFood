@@ -59,13 +59,14 @@ public class OrdersScreen : AppScreen
             var screen = Container.GetScreen<QrReservationScreen>();
             screen.SetModel(action.Item2);
             Container.Show(screen);
+            UpdateViews();
         }
         else if (action.Item1 == "Cancel")
         {
             UIContainer.InitView(_confirm, "Cancel this reservation?");
             UIContainer.SubscribeToView<ConfirmPanel, bool>(_confirm, (val) => ResultCancelConfirm(val, action.Item2));
             _confirm.Show();
-            
+            UpdateViews();
         }
         else { OnButtonAddReservation(); }
     }
