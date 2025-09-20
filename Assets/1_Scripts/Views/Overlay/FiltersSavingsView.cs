@@ -91,10 +91,18 @@ public class FiltersSavingsView : View
         base.UpdateUI();
         UpdateDateToggles();
         UpdateStatusToggles();
-        UIContainer.InitView(_venuesToggles, _data.VenueManager.GetAll());
+        UIContainer.InitView(_venuesToggles, GenerateData((_data.VenueManager.GetAll())));
 
     }
-
+    private List<VenueToggleView.Data> GenerateData(List<VenueModel> venues)
+    {
+        List<VenueToggleView.Data> list = new List<VenueToggleView.Data>();
+        foreach (var v in venues)
+        {
+            list.Add(new VenueToggleView.Data(v, _filters.VenueId == null ? false : _filters.VenueId == v.Id));
+        }
+        return list;
+    }
     private void UpdateDateToggles()
     {
         UIContainer.InitView(_allTime, _selectedDateRange == DateRanges.AllTime);

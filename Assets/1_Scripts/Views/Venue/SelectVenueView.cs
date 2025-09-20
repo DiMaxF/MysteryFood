@@ -10,13 +10,16 @@ public class SelectVenueView : View
     [SerializeField] private ListView _list;
     [SerializeField] private ButtonView _cancel;
     [SerializeField] private ButtonView _continue;
-    [SerializeField] private VenueModel _selectedVenue;
+    private VenueModel _selectedVenue;
 
     private List<VenueToggleView.Data> _venues;
     private List<VenueToggleView.Data> GenerateData(List<VenueModel> venues) 
     {
         List<VenueToggleView.Data> list = new List<VenueToggleView.Data>();
-        foreach (var v in venues) list.Add(new VenueToggleView.Data(v, _selectedVenue.Id== v.Id));
+        foreach (var v in venues)
+        {
+            list.Add(new VenueToggleView.Data(v, _selectedVenue == null ? false : _selectedVenue.Id == v.Id));
+        }
         return list;
     }
 
@@ -25,7 +28,7 @@ public class SelectVenueView : View
         for (var i = 0; i < _venues.Count; i++) 
         {
             var v = _venues[i];
-            v = new VenueToggleView.Data(v.Model, _selectedVenue.Id == v.Model.Id);
+            _venues[i] = new VenueToggleView.Data(v.Model, _selectedVenue == null ? false : _selectedVenue.Id == v.Model.Id);
         }
     }
 
@@ -41,6 +44,7 @@ public class SelectVenueView : View
     public override void UpdateUI()
     {
         base.UpdateUI();
+        //UpdateData();
         //_continue.interactable = _selectedVenue != null;
         UIContainer.InitView(_list, _venues);
         

@@ -22,7 +22,7 @@ public class VenueToggleView : View
     [SerializeField] private VenueListView _venue;
     [SerializeField] private ToggleView _toggle;
 
-    [SerializeField] private Data _data;
+     private Data _data;
 
     public override void Init<T>(T data)
     {
@@ -49,6 +49,7 @@ public class VenueToggleView : View
 
     private void SetActive() 
     {
-        TriggerAction(new Data(_data.Model, true));
+        _data = new Data(_data.Model, true);
+        TriggerAction(_data);
     }
 }

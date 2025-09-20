@@ -90,34 +90,15 @@ public class AppContainer : MonoBehaviour
         }
 
         var previousScreen = _history.Pop();
-
-        foreach (var screen in screens)
-        {
-            screen.gameObject.SetActive(screen == previousScreen);
-        }
-
-        if (_openedScreen != null) await _openedScreen.Hide();
-
-        _openedScreen = previousScreen;
-        _openedScreen.OnShow();
-
-        if (navigationBar != null)
-        {
-            if (hideNavigationBar.Contains(_openedScreen)) navigationBar.Hide();
-            else navigationBar.Show();
-
-            UpdateData();
-        }
-
+        Show(previousScreen);
     }
 
     public AppScreen FindScreen(string name) =>
-        screens.Where(s => s.name == name).FirstOrDefault();
+        screens.FirstOrDefault(s => s.name == name);
 
     public AScreen GetScreen<AScreen>() where AScreen : AppScreen
     {
-        var view = screens.OfType<AScreen>().FirstOrDefault();
-        return view;
+        return screens.OfType<AScreen>().FirstOrDefault();
     }
 
     [Serializable]
@@ -139,5 +120,4 @@ public class AppContainer : MonoBehaviour
 
         UIContainer.InitView(navigationBar, _data);
     }
-
 }

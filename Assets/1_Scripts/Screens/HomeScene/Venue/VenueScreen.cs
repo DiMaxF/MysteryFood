@@ -43,7 +43,9 @@ public class VenueScreen : AppScreen
         if (_model == null) return;
         _name.text = _model.Name;
         _location.text = _model.Location.Address;
-        UIContainer.InitView(_phone, _model.Phone);
+        UIContainer.InitView(_phone, _model.Phone.ToString());
+        Logger.Log("Int Phone: " + _model.Phone, "PHONE");
+
         UIContainer.InitView(_image, _model.ImagePath);
         _description.text = _model.Description;
         _ingridientsAllergenes.text = _model.IngredientsAllergens;

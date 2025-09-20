@@ -82,4 +82,40 @@ public class VenueManager : IDataManager
             r.Price.Currency = currency;
         }
     }
+
+    public List<VenueModel> GetFilteredVenues(FilterOptions filters, PersonalManager personalManager)
+    {
+        var venues = GetVenuesWithCoordinates();
+
+        if (filters != null)
+        {
+            if (filters.MaxDistanceKm.HasValue && personalManager.UserPosition != null)
+            {
+                venues = venues.Where(v => personalManager.CalculateDistance(v.Location) <= filters.MaxDistanceKm.Value).ToList();
+            }
+
+            if (filters.MinPrice.HasValue)
+            {
+                venues = venues.Where(v => v.Price.Amount >= filters.MinPrice.Value).ToList();
+            }
+
+            if (filters.MaxPrice.HasValue)
+            {
+                venues = venues.Where(v => v.Price.Amount <= filters.MaxPrice.Value).ToList();
+            }
+
+            if (filters.OnlyOpenNow)
+            {
+                var now = DateTime.Now.TimeOfDay;
+                venues = venues.Where(v =>
+                {
+                    var start = TimeSpan.Parse(v.StartTime);
+                    var end = TimeSpan.Parse(v.EndTime);
+                    return now >= start && now <= end;
+                }).ToList();
+            }
+        }
+
+        return venues;
+    }
 }

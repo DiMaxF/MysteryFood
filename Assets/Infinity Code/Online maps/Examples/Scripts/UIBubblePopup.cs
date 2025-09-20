@@ -28,7 +28,7 @@ namespace InfinityCode.OnlineMapsDemos
         /// VenueListView component for displaying venue data
         /// </summary>
         public VenueListView venueListView;
-        public Texture2D userTexture;   
+        public Texture2D userTexture;
         /// <summary>
         /// Array of VenueModel data
         /// </summary>
@@ -92,7 +92,7 @@ namespace InfinityCode.OnlineMapsDemos
             else
             {
                 userMarker = OnlineMapsMarkerManager.CreateItem(point.Longitude, point.Latitude, userTexture);
-                userMarker["data"] = null; 
+                userMarker["data"] = null;
                 userMarker.OnClick += (marker) =>
                 {
 
@@ -162,6 +162,41 @@ namespace InfinityCode.OnlineMapsDemos
 
             // Set local position of the popup
             (bubble.transform as RectTransform).localPosition = point;*/
+        }
+    
+    public void UpdateMarkers(bool preserveUserMarker = true)
+        {
+            // Save user marker if needed
+            OnlineMapsMarker savedUserMarker = preserveUserMarker ? userMarker : null;
+
+            // Clear all markers
+            OnlineMapsMarkerManager.RemoveAllItems();
+
+            // Restore user marker if preserved
+            if (savedUserMarker != null)
+            {
+                OnlineMapsMarkerManager.AddItem(savedUserMarker);
+            }
+
+            // Create new markers for venues
+            if (venues != null)
+            {
+                foreach (VenueModel venue in venues)
+                {
+                    if (venue?.Location != null) // Проверка на null
+                    {
+                        OnlineMapsMarker marker = OnlineMapsMarkerManager.CreateItem(venue.Location.Longitude, venue.Location.Latitude);
+                        marker["data"] = venue;
+                        marker.OnClick += OnMarkerClick;
+                    }
+                }
+            }
+
+            // Update bubble position if a venue is selected
+            if (targetMarker != null && bubble.activeSelf)
+            {
+                UpdateBubblePosition();
+            }
         }
     }
 }

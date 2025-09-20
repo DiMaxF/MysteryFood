@@ -33,10 +33,16 @@ public class QrReservationScreen : AppScreen
     {
         base.Subscriptions();
         UIContainer.SubscribeToView(_back, (object _) => OnButtonBack());
-        UIContainer.SubscribeToView(_confirm, (object _) => Container.Back().Forget());
+        UIContainer.SubscribeToView<ConfirmPanel, bool>(_confirm, ConfirmExit);
         UIContainer.SubscribeToView(_fullInfo, (object _) => OnButtonFullInfo());
         UIContainer.SubscribeToView(_markedAsPickedUp, (object _) => OnButtonMarked());
 
+    }
+
+    private void ConfirmExit(bool val) 
+    {
+        if (val) Container.Back().Forget();
+        _confirm.Hide();
     }
 
     private void OnButtonBack()

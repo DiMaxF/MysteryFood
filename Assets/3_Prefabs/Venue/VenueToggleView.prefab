@@ -804,24 +804,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _venue: {fileID: 5009243251417560413}
   _toggle: {fileID: 8277552163300125055}
-  _data:
-    Model:
-      Id: 0
-      Name: 
-      Location:
-        Address: 
-        Latitude: 0
-        Longitude: 0
-      Phone: 0
-      Price:
-        Amount: 0
-        Currency: 2
-      StartTime: 
-      EndTime: 
-      Description: 
-      IngredientsAllergens: 
-      ImagePath: 
-    Active: 0
 --- !u!114 &5009243251417560413
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1084,7 +1066,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4793231792476839734, guid: d8efbcc4227e06c4daea345a03e8e9a1, type: 3}
       propertyPath: m_SizeDelta.x
-      value: 0
+      value: 518.5884
       objectReference: {fileID: 0}
     - target: {fileID: 4793231792476839734, guid: d8efbcc4227e06c4daea345a03e8e9a1, type: 3}
       propertyPath: m_SizeDelta.y
@@ -1120,11 +1102,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4793231792476839734, guid: d8efbcc4227e06c4daea345a03e8e9a1, type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 0
+      value: 259.2942
       objectReference: {fileID: 0}
     - target: {fileID: 4793231792476839734, guid: d8efbcc4227e06c4daea345a03e8e9a1, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: -307.5
+      value: -134
       objectReference: {fileID: 0}
     - target: {fileID: 4793231792476839734, guid: d8efbcc4227e06c4daea345a03e8e9a1, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
@@ -1464,7 +1446,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5227066010207092302, guid: c64237d8445444a4e940a36d6e564f50, type: 3}
       propertyPath: m_SizeDelta.x
-      value: 0
+      value: 518.5884
       objectReference: {fileID: 0}
     - target: {fileID: 5227066010207092302, guid: c64237d8445444a4e940a36d6e564f50, type: 3}
       propertyPath: m_SizeDelta.y

@@ -142,6 +142,7 @@ public class AddVenueScreen : AppScreen
     {
         if (!int.TryParse(val, out var phone)) return;
         _model.Phone = phone;
+
         ValidateModel();
     }
     private void OnPriceEdit(string val)

@@ -12,12 +12,13 @@ public class Day : MonoBehaviour
         Disabled = 0, 
         Current = 1,
         Normal = 2,
-        Holyday = 3
+        Highlighted = 3
     }
 
     [SerializeField] private DayMode dayMode; 
     private Button button; 
     [SerializeField] private GameObject currentDateIndicator; 
+    [SerializeField] private GameObject hightlited; 
     [SerializeField] private Text dateText;
     public int dateNum; 
     public event Action<DateTime> OnSelect;
@@ -34,39 +35,33 @@ public class Day : MonoBehaviour
                 dateText.color = Color.gray;
                 button.interactable = false;
                 currentDateIndicator.SetActive(false);
+                hightlited.SetActive(false);
                 break;
             case DayMode.Current:
                 dateText.color = Color.black;
                 button.interactable = true;
                 currentDateIndicator.SetActive(true);
+                hightlited.SetActive(false);
                 break;
             case DayMode.Normal:
                 dateText.color = Color.white;
                 button.interactable = true;
                 currentDateIndicator.SetActive(false);
+                hightlited.SetActive(false);
                 break;
-            case DayMode.Holyday:
+            case DayMode.Highlighted:
                 dateText.color = Color.white;
                 button.interactable = true;
                 currentDateIndicator.SetActive(false);
+                hightlited.SetActive(true);
                 break;
         }
     }
 
     public void DayModeSet(int index)
     {
-        if (index == 0)
-        {
-            dayMode = DayMode.Disabled;
-        }
-        else if (index == 1)
-        {
-            dayMode = DayMode.Current;
-        }
-        else
-        {
-            dayMode = DayMode.Normal;
-        }
+        dayMode = (DayMode)index;
+
         SetUpUI();
     }
 

@@ -3,6 +3,11 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.UI;
+
 public class VenueListView : View
 {
     [SerializeField] private AsyncImageView image;
@@ -14,49 +19,64 @@ public class VenueListView : View
     [SerializeField] private Text pickupToday;
 
     private VenueModel _model;
-    
+
     public override void Init<T>(T data)
     {
-        if (data is VenueModel venue) 
+        if (data is VenueModel venue)
         {
             _model = venue;
         }
-        //DataCore.Instance.Personal.Gep
         base.Init(data);
     }
 
     public override void Subscriptions()
     {
         base.Subscriptions();
-        UIContainer.SubscribeToView(action, (object _) => TriggerAction(_model));
+        if (action != null)
+        {
+            UIContainer.SubscribeToView(action, (object _) => TriggerAction(_model));
+        }
     }
 
     public override void UpdateUI()
     {
         base.UpdateUI();
-        if (_model != null) 
+        if (_model == null) return;
+
+        if (image != null)
         {
             UIContainer.InitView(image, _model.ImagePath);
+        }
+
+        if (price != null)
+        {
             price.text = _model.Price.ToString();
+        }
+
+        if (pickupToday != null)
+        {
             pickupToday.text = $"{_model.StartTime}-{_model.EndTime}";
+        }
+
+        if (name != null)
+        {
             name.text = _model.Name;
+        }
+
+        if (address != null && _model.Location != null)
+        {
             address.text = _model.Location.Address;
-            if (!DataCore.Instance.PersonalManager.PermissionLocation)
+        }
+
+        if (distance != null)
+        {
+            if (!DataCore.Instance.PersonalManager.PermissionLocation || _model.Location == null || _model.Location.Latitude == 0)
             {
                 distance.text = "—";
             }
-            else 
+            else
             {
-                if (_model.Location.Latitude != 0)
-                {
-                    distance.text = $"{DataCore.Instance.PersonalManager.CalculateDistance(_model.Location):F2} km";
-                    DataCore.Instance.PersonalManager.CalculateDistance(_model.Location);
-                }
-                else
-                {
-
-                    distance.text = "—";
-                }
+                distance.text = $"{DataCore.Instance.PersonalManager.CalculateDistance(_model.Location):F2} km";
             }
         }
     }
