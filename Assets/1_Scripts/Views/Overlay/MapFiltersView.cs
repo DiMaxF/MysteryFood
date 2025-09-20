@@ -36,6 +36,7 @@ public class MapFiltersView : View
         UIContainer.InitView(_distance, new SliderData(0, 10));
         UIContainer.InitView(_minPrice, "");
         UIContainer.InitView(_maxPrice, "");
+        UIContainer.InitView(_pickupNow, false);
 
     }
 
@@ -46,35 +47,39 @@ public class MapFiltersView : View
         UIContainer.SubscribeToView<ButtonView, object>(_applyFilters, _ => TriggerAction(_filters));
         UIContainer.SubscribeToView<ButtonView, object>(_close, _ => Hide());
 
-        UIContainer.SubscribeToView<ToggleView, bool>(_pickupNow, (val) => AddCategory(val, StatusReservation.Cancelled));
+        UIContainer.SubscribeToView<ToggleView, bool>(_pickupNow, NowToggle);
         UIContainer.SubscribeToView<InputTextView, string>(_minPrice, ChangeMinPrice);
         UIContainer.SubscribeToView<InputTextView, string>(_maxPrice, ChangMaxPrice);
         UIContainer.SubscribeToView<SliderView, float>(_distance, ChangeDistance);
     }
-
+    private void NowToggle(bool val)
+    {
+        _filters.OnlyOpenNow = val;
+    }
     private void ChangeMinPrice(string val) 
     {
         if (val == "") _filters.MinPrice = null;
-        if (!int.TryParse(val, out var price)) return;
-        _filters.MinPrice = price;
+        else 
+        {
+            if (!int.TryParse(val, out var price)) return;
+            _filters.MinPrice = price;
+        }
+
     }
     private void ChangMaxPrice(string val)
     {
         if (val == "") _filters.MaxPrice = null;
-        if (!int.TryParse(val, out var price)) return;
-        _filters.MaxPrice = price;
+        else 
+        {
+            if (!int.TryParse(val, out var price)) return;
+            _filters.MaxPrice = price;
+        }
     }
 
     private void ChangeDistance(float val) 
     {
-        _filters.MaxDistanceKm = val;
-    }
-
-    private void AddCategory(bool val, StatusReservation status)
-    {
-        if (val) _filters.Statuses.Add(status);
-        else _filters.Statuses.Remove(status);
-
+        if (val == 0) _filters.MaxDistanceKm = null;
+        else _filters.MaxDistanceKm = val;
     }
 
 

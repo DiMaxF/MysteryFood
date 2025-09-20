@@ -31,7 +31,12 @@ public class DataCore : MonoBehaviour
         private set;
         get;
     }
-    
+    public NotificationManager NotificationManager 
+    { 
+        private set;
+        get; 
+    }
+
     private bool FirstEnter 
     {
         get => PlayerPrefs.GetInt("FirstEnter") == 1;
@@ -58,6 +63,7 @@ public class DataCore : MonoBehaviour
         if (FirstEnter) 
         {
             RequestLocationPermission();
+            RequestNotificationPermission();
         }
         if (PersonalManager.PermissionLocation) 
         {
@@ -65,7 +71,15 @@ public class DataCore : MonoBehaviour
         }
         FirstEnter = false;
     }
-
+    public async void RequestNotificationPermission()
+    {
+        bool granted = await NotificationManager.RequestNotificationPermissionAsync();
+        PersonalManager.PermissionNotification = granted;
+        if (granted)
+        {
+            NotificationManager.RebuildNotificationQueue(); 
+        }
+    }
     public async void RequestLocationPermission() 
     {
         if (!await _location.CheckAndRequestPermissionAsync())
@@ -92,9 +106,11 @@ public class DataCore : MonoBehaviour
     private void InitializeManagers()
     {
         VenueManager = new VenueManager(_appData);
-        ReservationManager = new ReservationManager(_appData);
         PersonalManager = new PersonalManager(_appData);
         SavingsTrackerManager = new SavingsTrackerManager(_appData);
+        NotificationManager = new NotificationManager(_appData);
+        ReservationManager = new ReservationManager(_appData, NotificationManager);
+
     }
 
     public void ClearData() 
@@ -142,6 +158,7 @@ public class DataCore : MonoBehaviour
             {
                 _appData = loadedData;
                 InitializeManagers();
+                NotificationManager.RebuildNotificationQueue();
             }
         }
         catch (Exception ex)

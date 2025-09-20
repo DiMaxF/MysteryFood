@@ -15,4 +15,5 @@ public class AppData
     public bool PermissionLocation;
     public bool PermissionNotification;
     public GeoPoint UserLocation;
+    public List<NotificationModel> Notifications;
 }

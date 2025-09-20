@@ -1,3 +1,4 @@
+using NUnit.Framework.Interfaces;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -7,13 +8,15 @@ using UnityEngine;
 public class ReservationManager : IDataManager
 {
     private readonly AppData _appData;
+    private NotificationManager _notification;
     private int _index
     {
         set => PlayerPrefs.SetInt("ReservationIndex", value);
         get => PlayerPrefs.GetInt("ReservationIndex", 0);
     }
-    public ReservationManager(AppData appData)
+    public ReservationManager(AppData appData, NotificationManager notification)
     {
+        _notification = notification;
         _appData = appData ?? throw new ArgumentNullException(nameof(appData));
     }
 
@@ -26,6 +29,7 @@ public class ReservationManager : IDataManager
     {
         model.Id = _index;
         _index++;
+        if(model.Notification) _notification.AddNotificationForReservation(model);
         _appData.Reservations.Add(model);
     }
 
@@ -59,7 +63,8 @@ public class ReservationManager : IDataManager
         existing.QrPath = updated.QrPath;
         existing.Notification = updated.Notification;
         existing.Status = updated.Status;
-
+        if (existing.Notification) _notification.AddNotificationForReservation(existing);
+        else _notification.RemoveNotification(existing.Id);
         Logger.Log($"Reservation with Id {updated.Id} updated successfully", "ReservationManager");
         return true;
     }
