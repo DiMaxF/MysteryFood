@@ -1,53 +1,120 @@
 using Cysharp.Threading.Tasks;
 using System;
+using System.Linq;
+using Unity.Notifications;
+using Unity.Notifications.Android;
 using UnityEngine;
-using UnityEngine.Experimental.AI;
+using UnityEngine.Android;
 
 public class NotificationController : MonoBehaviour
 {
     private NotificationManager _notificationManager;
+    private const string CHANNEL_ID = "channel0"; // Идентификатор канала
 
     private void Start()
     {
         _notificationManager = DataCore.Instance.NotificationManager;
-        RebuildNotificationQueue(); 
+        InitializeNotifications();
+        RebuildNotificationQueue();
     }
-    public void TestNotification()
+
+    private void InitializeNotifications()
     {
-        var testNotification = new NotificationModel(UnityEngine.Random.Range(1000, 9999), "Test push", "The test push notification", DateTime.Now.AddSeconds(10));
-        _notificationManager.ScheduleNotification(testNotification);
-        Logger.Log($"Test notification created with ID {testNotification.Id}");
+#if UNITY_ANDROID
+        // Регистрация канала уведомлений
+        var channel = new AndroidNotificationChannel()
+        {
+            Id = CHANNEL_ID,
+            Name = "Default Channel", // Название канала (видно в настройках уведомлений)
+            Importance = Importance.High, // Уровень важности
+            Description = "Default notification channel for MysteryFood", // Описание канала
+            CanShowBadge = true, // Разрешить отображение бейджей
+            EnableVibration = true // Разрешить вибрацию
+        };
+        AndroidNotificationCenter.RegisterNotificationChannel(channel);
+        AndroidNotificationCenter.Initialize();
+#elif UNITY_IOS
+        iOSNotificationCenter.Initialize();
+#endif
     }
+
     public async UniTask<bool> RequestNotificationPermission()
     {
-        bool granted = await _notificationManager.RequestNotificationPermissionAsync();
-        if (granted)
+#if UNITY_IOS
+        var currentStatus = iOSNotificationCenter.GetAuthorizationStatus();
+        if (currentStatus != AuthorizationStatus.Authorized)
         {
-            Logger.Log("Notification permission granted.");
-            RebuildNotificationQueue();
+            var result = await iOSNotificationCenter.RequestAuthorizationAsync(
+                AuthorizationOption.Alert | AuthorizationOption.Badge | AuthorizationOption.Sound);
+            _notificationManager.Permission = result;
+            if (result)
+            {
+                Logger.Log("Notification permission granted.");
+                RebuildNotificationQueue();
+            }
+            else
+            {
+                Logger.LogWarning("Notification permission denied.");
+            }
+            return result;
         }
-        else
+        _notificationManager.Permission = true;
+        return true;
+#elif UNITY_ANDROID
+        if (!Permission.HasUserAuthorizedPermission("android.permission.POST_NOTIFICATIONS"))
         {
-            Logger.LogWarning("Notification permission denied.");
+            Permission.RequestUserPermission("android.permission.POST_NOTIFICATIONS");
+            await UniTask.WaitUntil(
+                () => Permission.HasUserAuthorizedPermission("android.permission.POST_NOTIFICATIONS"));
+            _notificationManager.Permission = Permission.HasUserAuthorizedPermission("android.permission.POST_NOTIFICATIONS"); // Исправлено: AppData вместо Permission
+            if (_notificationManager.Permission)
+            {
+                Logger.Log("Notification permission granted.");
+                RebuildNotificationQueue();
+            }
+            else
+            {
+                Logger.LogWarning("Notification permission denied.");
+            }
+            return _notificationManager.Permission;
         }
-        return granted;
+        _notificationManager.Permission = true;
+        return true;
+#else
+        _notificationManager.Permission = false;
+        return false;
+#endif
+    }
+
+    public void TestNotification()
+    {
+        var testNotification = new NotificationModel(UnityEngine.Random.Range(1000, 9999), "Test push", "The test push notification", DateTime.Now.AddSeconds(5));
+        ScheduleNotification(testNotification);
+        Logger.Log($"Test notification created with ID {testNotification.Id}");
     }
 
     public void CreateNotificationForReservation(ReservationModel reservation)
     {
         _notificationManager.AddNotificationForReservation(reservation);
-        Logger.Log($"Notification scheduled for reservation {reservation.Id}");
+        var notification = _notificationManager.GetActiveNotifications().FirstOrDefault(n => n.Id == reservation.Id);
+        if (notification != null)
+        {
+            ScheduleNotification(notification);
+            Logger.Log($"Notification scheduled for reservation {reservation.Id}");
+        }
     }
 
     public void CompleteNotification(int id)
     {
         _notificationManager.MarkNotificationAsCompleted(id);
+        CancelNotification(id);
         Logger.Log($"Notification {id} marked as completed.");
     }
 
     public void DeleteNotification(int id)
     {
         _notificationManager.RemoveNotification(id);
+        CancelNotification(id);
         Logger.Log($"Notification {id} deleted.");
     }
 
@@ -62,13 +129,63 @@ public class NotificationController : MonoBehaviour
 
     public void RebuildNotificationQueue()
     {
+        ClearNotifications();
         _notificationManager.RebuildNotificationQueue();
+        foreach (var notification in _notificationManager.GetActiveNotifications())
+        {
+            ScheduleNotification(notification);
+        }
         Logger.Log("Notification queue rebuilt from controller.");
     }
 
-    public void ClearAllNotifications()
+    public void ClearNotifications()
     {
-        _notificationManager.ClearNotifications();
+        foreach (var notification in _notificationManager.GetActiveNotifications())
+        {
+            CancelNotification(notification.Id);
+        }
         Logger.Log("All notifications cleared.");
+    }
+
+    private void ScheduleNotification(NotificationModel notification)
+    {
+        if (notification.FireTime <= DateTime.Now)
+        {
+            Logger.LogWarning($"Cannot schedule notification {notification.Id}: Fire time is in the past.");
+            return;
+        }
+#if UNITY_ANDROID
+        var androidNotification = new AndroidNotification
+        {
+            Title = notification.Title,
+            Text = notification.Message,
+            FireTime = notification.FireTime,
+            SmallIcon = "icon_0",
+            LargeIcon = "icon_1"
+        };
+        AndroidNotificationCenter.SendNotificationWithExplicitID(androidNotification, CHANNEL_ID, notification.Id);
+#elif UNITY_IOS
+        var iosNotification = new iOSNotification
+        {
+            Identifier = notification.Id,
+            Title = notification.Title,
+            Body = notification.Message,
+            Trigger = new iOSNotificationTimeIntervalTrigger
+            {
+                TimeInterval = notification.FireTime - DateTime.Now,
+                Repeats = false
+            }
+        };
+        iOSNotificationCenter.ScheduleNotification(iosNotification);
+#endif
+    }
+
+    private void CancelNotification(int id)
+    {
+#if UNITY_ANDROID
+        AndroidNotificationCenter.CancelScheduledNotification(id);
+#elif UNITY_IOS
+        iOSNotificationCenter.RemoveScheduledNotification(id);
+#endif
     }
 }

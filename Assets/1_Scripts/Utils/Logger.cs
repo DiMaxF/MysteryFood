@@ -11,7 +11,7 @@ public class Logger
         Error,
         Warning
     }
-    const bool active = false;
+    const bool active = true;
     const string TAG = "MysteryFood";
 
     public static void TryCatch(Action action)

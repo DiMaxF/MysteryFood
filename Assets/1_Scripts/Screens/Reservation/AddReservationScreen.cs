@@ -32,6 +32,8 @@ public class AddReservationScreen : AppScreen
     [SerializeField] private Text _saveMoney;
     [SerializeField] private Text _price;
     [SerializeField] private InputTextView _notes;
+    [SerializeField] private ToggleView _notificationToggle;
+    [SerializeField] private ToastView _toast;
 
     [Header("QR")]
     [SerializeField] private QRCodeEncodeController _qrCodeEncodeController;
@@ -59,6 +61,7 @@ public class AddReservationScreen : AppScreen
         );
         base.OnStart();
         UIContainer.RegisterView(_timePicker);
+        UIContainer.RegisterView(_toast);
         _timePicker.Hide();
 
         if (Data.PersonalManager.PermissionLocation)
@@ -72,6 +75,7 @@ public class AddReservationScreen : AppScreen
         }
         UIContainer.InitView(_timeStartInput, _venueModel.StartTime);
         UIContainer.InitView(_timeEndInput, _venueModel.EndTime);
+        UIContainer.InitView(_notificationToggle, _model.Notification);
         _model.OriginalPrice = _venueModel.Price;   
     }
 
@@ -89,7 +93,18 @@ public class AddReservationScreen : AppScreen
         UIContainer.SubscribeToView<InputTextView, string>(_originalPrice, OnOriginalPriceEdit);
         UIContainer.SubscribeToView<InputTextView, string>(_discountedPrice, OnDiscountedPriceEdit);
         UIContainer.SubscribeToView<InputTextView, string>(_notes, OnNotesEdit);
+        UIContainer.SubscribeToView<ToggleView, bool>(_notificationToggle, OnToggleNotification);
 
+    }
+
+    private void OnToggleNotification(bool val) 
+    {
+        if (Data.PersonalManager.Notification == -1 && val) 
+        {
+            UIContainer.InitView(_toast, "Notifications disabled. You can enable them in Settings");
+            _toast.Show();
+        }
+        _model.Notification = val;
     }
 
     protected override void UpdateViews()

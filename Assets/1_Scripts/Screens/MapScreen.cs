@@ -19,6 +19,7 @@ public class MapScreen : AppScreen
     [SerializeField] private ButtonView _userLocation;
     [SerializeField] private BaseView _loading;
     [SerializeField] InputTextView _searchView;
+    [SerializeField] LocationManager _locationManager;
 
     [Header("Action")]
     [SerializeField] private ButtonView _reservation;
@@ -158,7 +159,7 @@ public class MapScreen : AppScreen
         };
         UIContainer.SubscribeToView<MapFiltersView, FilterOptions>(_filters, ApplyFilters);
 
-        UIContainer.SubscribeToView<ButtonView, object>(_userLocation, _ => GoToPoint(Data.PersonalManager.UserPosition));
+        UIContainer.SubscribeToView<ButtonView, object>(_userLocation, _ => OnUserPosition());
         UIContainer.SubscribeToView<ButtonView, object>(_retry, _ => LoadMap());
         UIContainer.SubscribeToView(_reservation, (object _) => AddReservation());
         UIContainer.SubscribeToView(_openVenue, (object _) => OpenVenue());
@@ -170,7 +171,12 @@ public class MapScreen : AppScreen
         });
         UIContainer.SubscribeToView<InputTextView, string>(_searchView, OnSearchViewAction);
     }
-
+    private async void OnUserPosition() 
+    {
+        var point = await _locationManager.GetLocationAsync();
+        Data.PersonalManager.UserPosition = point;
+        GoToPoint(Data.PersonalManager.UserPosition);
+    }
     private void OpenFilters() 
     {
         _filters.Show();

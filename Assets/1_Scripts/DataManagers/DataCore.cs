@@ -10,6 +10,7 @@ public class DataCore : MonoBehaviour
 
     [SerializeField] AppData _appData = new AppData();
     [SerializeField] LocationManager _location;
+    [SerializeField] NotificationController _notification;
 
     public VenueManager VenueManager 
     {
@@ -39,11 +40,11 @@ public class DataCore : MonoBehaviour
 
     private bool FirstEnter 
     {
-        get => PlayerPrefs.GetInt("FirstEnter") == 1;
+        get => PlayerPrefs.GetInt("FirstEnter", 1) == 1;
         set => PlayerPrefs.SetInt("FirstEnter", value ? 1 : 0); 
     }
 
-    private const string AppDataFileName = "dddddddd.json";
+    private const string AppDataFileName = "appData.json";
 
     private void Awake()
     {
@@ -62,6 +63,7 @@ public class DataCore : MonoBehaviour
         }
         if (FirstEnter) 
         {
+            _appData.Notification = -1;
             RequestLocationPermission();
             RequestNotificationPermission();
         }
@@ -73,7 +75,7 @@ public class DataCore : MonoBehaviour
     }
     public async void RequestNotificationPermission()
     {
-        bool granted = await NotificationManager.RequestNotificationPermissionAsync();
+        bool granted = await _notification.RequestNotificationPermission();
         PersonalManager.PermissionNotification = granted;
         if (granted)
         {

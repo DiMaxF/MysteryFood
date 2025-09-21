@@ -8,8 +8,9 @@ public class CurrencyText : MonoBehaviour
     [SerializeField] private Text _text;
     DataCore _data => DataCore.Instance;
 
-    private void OnEnable()
+    private async void OnEnable()
     {
+        while(_data == null) await System.Threading.Tasks.Task.Yield(); 
         _text.text = _data.PersonalManager.Currency.ToString(); 
     }
 }
