@@ -3,10 +3,6 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-using UnityEngine.UI;
 
 public class VenueListView : View
 {
@@ -37,7 +33,16 @@ public class VenueListView : View
             UIContainer.SubscribeToView(action, (object _) => TriggerAction(_model));
         }
     }
+    public string ShortString(string input, int length)
+    {
+        if (string.IsNullOrEmpty(input) || length <= 0)
+            return string.Empty;
 
+        if (input.Length <= length)
+            return input;
+
+        return input.Substring(0, length) + "...";
+    }
     public override void UpdateUI()
     {
         base.UpdateUI();
@@ -60,12 +65,12 @@ public class VenueListView : View
 
         if (name != null)
         {
-            name.text = _model.Name;
+            name.text =ShortString(_model.Name, 40);
         }
 
         if (address != null && _model.Location != null)
         {
-            address.text = _model.Location.Address;
+            address.text = ShortString(_model.Location.Address, 40);
         }
 
         if (distance != null)

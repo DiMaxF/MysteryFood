@@ -1,5 +1,8 @@
+using Cysharp.Threading.Tasks;
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading;
 using UnityEngine;
 
 public class OrdersScreen : AppScreen
@@ -15,6 +18,16 @@ public class OrdersScreen : AppScreen
     [SerializeField] InputTextView searchView;
     private string _searchData = "";
     private StatusReservation _showCategory = StatusReservation.Booked;
+    
+    // Поиск с кулдауном
+    private CancellationTokenSource _searchCancellationTokenSource;
+    [SerializeField] private float searchDelay = 0.3f; // Настраиваемая задержка поиска
+    private bool _isSearching = false; // Флаг для отслеживания состояния поиска
+    
+    /// <summary>
+    /// Возвращает true, если поиск в процессе выполнения
+    /// </summary>
+    public bool IsSearching => _isSearching;
 
     protected override void OnStart()
     {
@@ -111,6 +124,59 @@ public class OrdersScreen : AppScreen
     private void OnSearchViewAction(string val)
     {
         _searchData = val;
-        UpdateViews();
+        
+        // Отменяем предыдущий поиск, если он еще не выполнился
+        CancelPreviousSearch();
+        
+        // Запускаем новый поиск с кулдауном
+        StartSearchWithDelay();
+    }
+    
+    private void CancelPreviousSearch()
+    {
+        if (_searchCancellationTokenSource != null)
+        {
+            _searchCancellationTokenSource.Cancel();
+            _searchCancellationTokenSource.Dispose();
+        }
+        _searchCancellationTokenSource = new CancellationTokenSource();
+    }
+    
+    private async void StartSearchWithDelay()
+    {
+        try
+        {
+            _isSearching = true;
+            Logger.Log("Search started, waiting for delay...", "OrdersScreen");
+            
+            // Ждем указанное время
+            await UniTask.Delay(TimeSpan.FromSeconds(searchDelay), cancellationToken: _searchCancellationTokenSource.Token);
+            
+            // Если таймер не был отменен, выполняем поиск
+            if (!_searchCancellationTokenSource.Token.IsCancellationRequested)
+            {
+                Logger.Log("Executing search after delay", "OrdersScreen");
+                UpdateViews();
+            }
+        }
+        catch (OperationCanceledException)
+        {
+            // Поиск был отменен - это нормально, ничего не делаем
+            Logger.Log("Search cancelled due to new input", "OrdersScreen");
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError($"Error in search delay: {ex.Message}", "OrdersScreen");
+        }
+        finally
+        {
+            _isSearching = false;
+        }
+    }
+    
+    private void OnDestroy()
+    {
+        // Очищаем ресурсы при уничтожении объекта
+        CancelPreviousSearch();
     }
 }

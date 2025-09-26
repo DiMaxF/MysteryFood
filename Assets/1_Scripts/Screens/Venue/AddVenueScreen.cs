@@ -186,7 +186,7 @@ public class AddVenueScreen : AppScreen
             if (_updateVenue) Data.VenueManager.UpdateVenue(_model);
             else Data.VenueManager.AddVenue(_model);
             Data.SaveData();
-            UIContainer.InitView(_toast, "Venue successfully added");
+            UIContainer.InitView(_toast, "Venue successfully" + (_updateVenue ? "updated" : "added"));
             Container.Show<HomeScreen>();
         }
         else 

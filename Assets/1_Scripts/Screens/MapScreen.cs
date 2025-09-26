@@ -30,13 +30,23 @@ public class MapScreen : AppScreen
     [SerializeField] private BaseView _error;
     [SerializeField] private ButtonView _retry;
     [SerializeField] private ButtonView _venueList;
-
+    [SerializeField] private ButtonView _closeMap;
     [Header("Overlay")]
     [SerializeField] private MapFiltersView _filters;
     private VenueModel _selectedVenue;
     private FilterOptions _filtersOptions = new FilterOptions();
     private CancellationTokenSource _loadMapCts;
     private string _searchData = "";
+    
+    // Поиск с кулдауном
+    private CancellationTokenSource _searchCancellationTokenSource;
+    [SerializeField] private float searchDelay = 0.3f; // Настраиваемая задержка поиска
+    private bool _isSearching = false; // Флаг для отслеживания состояния поиска
+    
+    /// <summary>
+    /// Возвращает true, если поиск в процессе выполнения
+    /// </summary>
+    public bool IsSearching => _isSearching;
 
     protected override void OnStart()
     {
@@ -72,11 +82,11 @@ public class MapScreen : AppScreen
         try
         {
             bool isConnected = await CheckInternetAsync(cancellationToken);
-            cancellationToken.ThrowIfCancellationRequested(); // ��������� ������ ����� CheckInternetAsync
+            cancellationToken.ThrowIfCancellationRequested(); 
             if (isConnected)
             {
                 DrawVenuesOnMap();
-                cancellationToken.ThrowIfCancellationRequested(); // ��������� ����� ���������� �����
+                cancellationToken.ThrowIfCancellationRequested(); 
                 _map.gameObject.SetActive(true);
                 _canvasPopup.gameObject.SetActive(true);
                 CreateUserPoint();
@@ -127,11 +137,13 @@ public class MapScreen : AppScreen
             _userLocation.Show();
         }
         else _userLocation.Hide();
+
         
     }
 
     public void GoToPoint(GeoPoint point)
     {
+        if (point == null) return;
         _map.SetPosition(point.Longitude, point.Latitude);
         _map.zoom = 18;
     }
@@ -149,6 +161,12 @@ public class MapScreen : AppScreen
         _canvasPopup.gameObject.SetActive(false);
         CancelLoadMap();
     }
+    
+    private void OnDestroy()
+    {
+        // Очищаем ресурсы при уничтожении объекта
+        CancelPreviousSearch();
+    }
 
     protected override void Subscriptions()
     {
@@ -158,6 +176,7 @@ public class MapScreen : AppScreen
             _selectedVenue = venue;
         };
         UIContainer.SubscribeToView<MapFiltersView, FilterOptions>(_filters, ApplyFilters);
+        UIContainer.SubscribeToView(_closeMap, (object _) => _bubbles.OnMapClick());
 
         UIContainer.SubscribeToView<ButtonView, object>(_userLocation, _ => OnUserPosition());
         UIContainer.SubscribeToView<ButtonView, object>(_retry, _ => LoadMap());
@@ -176,6 +195,7 @@ public class MapScreen : AppScreen
         var point = await _locationManager.GetLocationAsync();
         Data.PersonalManager.UserPosition = point;
         GoToPoint(Data.PersonalManager.UserPosition);
+        _bubbles.UpdateMarkers(true);
     }
     private void OpenFilters() 
     {
@@ -194,7 +214,54 @@ public class MapScreen : AppScreen
     private void OnSearchViewAction(string val)
     {
         _searchData = val;
-        DrawVenuesOnMap();
+        
+        // Отменяем предыдущий поиск, если он еще не выполнился
+        CancelPreviousSearch();
+        
+        // Запускаем новый поиск с кулдауном
+        StartSearchWithDelay();
+    }
+    
+    private void CancelPreviousSearch()
+    {
+        if (_searchCancellationTokenSource != null)
+        {
+            _searchCancellationTokenSource.Cancel();
+            _searchCancellationTokenSource.Dispose();
+        }
+        _searchCancellationTokenSource = new CancellationTokenSource();
+    }
+    
+    private async void StartSearchWithDelay()
+    {
+        try
+        {
+            _isSearching = true;
+            Logger.Log("Search started, waiting for delay...", "MapScreen");
+            
+            // Ждем указанное время
+            await UniTask.Delay(TimeSpan.FromSeconds(searchDelay), cancellationToken: _searchCancellationTokenSource.Token);
+            
+            // Если таймер не был отменен, выполняем поиск
+            if (!_searchCancellationTokenSource.Token.IsCancellationRequested)
+            {
+                Logger.Log("Executing search after delay", "MapScreen");
+                DrawVenuesOnMap();
+            }
+        }
+        catch (OperationCanceledException)
+        {
+            // Поиск был отменен - это нормально, ничего не делаем
+            Logger.Log("Search cancelled due to new input", "MapScreen");
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError($"Error in search delay: {ex.Message}", "MapScreen");
+        }
+        finally
+        {
+            _isSearching = false;
+        }
     }
 
     private void OpenVenue() 
@@ -207,6 +274,7 @@ public class MapScreen : AppScreen
     private void AddReservation()
     {
         var screen = Container.GetScreen<AddReservationScreen>();
+        screen.Clear();
         screen.SetVenue(_selectedVenue);
         Container.Show(screen);
     }
@@ -246,7 +314,7 @@ public class MapScreen : AppScreen
     {
         if (!HasNetworkReachability())
         {
-            Logger.LogWarning("���� ���������� (Application.internetReachability).");
+            Logger.LogWarning("���� ���������� (Application.internetReachability).");
             return false;
         }
 
@@ -262,25 +330,25 @@ public class MapScreen : AppScreen
 
                 if (operation.IsCanceled)
                 {
-                    Logger.LogWarning("�������� ��������� ���� ��������.");
+                    Logger.LogWarning("�������� ��������� ���� ��������.");
                     return false;
                 }
 
                 if (request.result == UnityWebRequest.Result.Success)
                 {
-                    Logger.Log("�������� ��������.");
+                    Logger.Log("�������� ��������.");
                     return true;
                 }
                 else
                 {
-                    Logger.LogWarning($"������ HTTP-�������: {request.error}");
+                    Logger.LogWarning($"������ HTTP-�������: {request.error}");
                     return false;
                 }
             }
         }
         catch (Exception ex)
         {
-            Logger.LogError($"������ ��� �������� ���������: {ex.Message}");
+            Logger.LogError($"������ ��� �������� ���������: {ex.Message}");
             return false;
         }
     }

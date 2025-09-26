@@ -31,11 +31,22 @@ public class OrderDetailsScreen : AppScreen
     [SerializeField] private Text _savedMoney;
     [SerializeField] private Text _reservationId;
     [SerializeField] private StatusView _status;
+    [Header("Overlay")]
+    [SerializeField] private ConfirmPanel _confirmPanel;
 
     private ReservationModel _model;
 
     public void SetModel(ReservationModel model) => _model = model;
+    public string ShortString(string input, int length)
+    {
+        if (string.IsNullOrEmpty(input) || length <= 0)
+            return string.Empty;
 
+        if (input.Length <= length)
+            return input;
+
+        return input.Substring(0, length) + "...";
+    }
     protected override void UpdateViews()
     {
         base.UpdateViews();
@@ -43,7 +54,8 @@ public class OrderDetailsScreen : AppScreen
         var venue = Data.VenueManager.GetById(_model.VenueId);
         _name.text = venue.Name;
         _quantity.text = $"x{_model.Quantity}";
-        _location.text = venue.Location.Address;
+
+        _location.text = ShortString(venue.Location.Address, 30);
         UIContainer.InitView(_phone, venue.Phone.ToString());
         UIContainer.InitView(_image, venue.ImagePath);
         UIContainer.InitView(_status, _model.Status);
@@ -90,6 +102,7 @@ public class OrderDetailsScreen : AppScreen
     protected override void OnStart()
     {
         base.OnStart();
+        UIContainer.RegisterView(_confirmPanel);
     }
 
     protected override void Subscriptions()
@@ -121,9 +134,25 @@ public class OrderDetailsScreen : AppScreen
 
     private void OnUpdateStatus(StatusReservation status)
     {
-        _model.Status = status;
-        _model.EndAt = DateTime.Now.ToString(DateTimeUtils.Full);
-        Data.ReservationManager.Update(_model);
-        Data.SaveData();
+        UIContainer.UnsubscribeFromView(_confirmPanel);
+        UIContainer.SubscribeToView(_confirmPanel, (bool _) => ChangeStatus(status, _));
+
+        if (status == StatusReservation.PickedUp) UIContainer.InitView(_confirmPanel, "Mark the reservation as picked up?");
+        else if(status == StatusReservation.Cancelled) UIContainer.InitView(_confirmPanel, "Are you sure you want to cancel the reservation?");
+        _confirmPanel.Show();
+        
+    }
+
+    private void ChangeStatus(StatusReservation status, bool val) 
+    {
+        if (val) 
+        {
+            _model.Status = status;
+            _model.EndAt = DateTime.Now.ToString(DateTimeUtils.Full);
+            Data.ReservationManager.Update(_model);
+            Data.SaveData();
+            UpdateViews();
+        }
+        _confirmPanel.Hide();
     }
 }

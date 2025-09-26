@@ -2,6 +2,7 @@ using Cysharp.Threading.Tasks;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -18,6 +19,16 @@ public class HomeScreen : AppScreen
 
     [SerializeField] private SelectVenueView _selectVenue;
     private string _searchData = "";
+    
+    // Поиск с кулдауном
+    private CancellationTokenSource _searchCancellationTokenSource;
+    [SerializeField] private float searchDelay = 0.3f; // Настраиваемая задержка поиска
+    private bool _isSearching = false; // Флаг для отслеживания состояния поиска
+    
+    /// <summary>
+    /// Возвращает true, если поиск в процессе выполнения
+    /// </summary>
+    public bool IsSearching => _isSearching;
     protected override void OnStart()
     {
         base.OnStart();
@@ -25,17 +36,21 @@ public class HomeScreen : AppScreen
         {
             hintDistance.Hide();
         }
-        else 
+        else
         {
             hintDistance.Show();
         }
         UIContainer.InitView(searchView, "");
-        savedMoney.maxValue =  Data.SavingsTrackerManager.GetTotalSpentForMonth(DateTime.Now.Year, DateTime.Now.Month);
-        var savedVal = Data.SavingsTrackerManager.GetTotalSavedForMonth(DateTime.Now.Year, DateTime.Now.Month);
-        savedMoney.value = savedVal;
-        Logger.Log($"{Data.SavingsTrackerManager.GetTotalSpentForMonth(DateTime.Now.Year, DateTime.Now.Month)} {savedVal}");
 
-        savedMoneyValue.text = $"{savedVal}{Data.PersonalManager.Currency}";
+        var totalSpent = Data.SavingsTrackerManager.GetTotalSpentForMonth(DateTime.Now.Year, DateTime.Now.Month);
+        var savedVal = Data.SavingsTrackerManager.GetTotalSavedForMonth(DateTime.Now.Year, DateTime.Now.Month);
+
+        // ✅ Защита от некорректных значений
+        savedMoney.maxValue = Mathf.Max(1, totalSpent); // Минимум 1, чтобы избежать деления на 0
+        savedMoney.value = Mathf.Max(0, savedVal); // Не показываем отрицательные значения
+
+        Logger.Log($"Total Spent: {totalSpent}, Saved: {savedVal}", "HomeScreen");
+        savedMoneyValue.text = $"{Mathf.Max(0, savedVal)}{Data.PersonalManager.Currency}";
     }
 
     protected override void Subscriptions()
@@ -94,6 +109,7 @@ public class HomeScreen : AppScreen
         {
             var screen = Container.GetScreen<AddReservationScreen>();
             screen.SetVenue(venue);
+            screen.Clear();
             Container.Show(screen);
         }
         else
@@ -118,7 +134,60 @@ public class HomeScreen : AppScreen
 
     private void OnSearchViewAction(string val) 
     {
-        _searchData = val;  
-        UpdateViews();
+        _searchData = val;
+        
+        // Отменяем предыдущий поиск, если он еще не выполнился
+        CancelPreviousSearch();
+        
+        // Запускаем новый поиск с кулдауном
+        StartSearchWithDelay();
+    }
+    
+    private void CancelPreviousSearch()
+    {
+        if (_searchCancellationTokenSource != null)
+        {
+            _searchCancellationTokenSource.Cancel();
+            _searchCancellationTokenSource.Dispose();
+        }
+        _searchCancellationTokenSource = new CancellationTokenSource();
+    }
+    
+    private async void StartSearchWithDelay()
+    {
+        try
+        {
+            _isSearching = true;
+            Logger.Log("Search started, waiting for delay...", "HomeScreen");
+            
+            // Ждем указанное время
+            await UniTask.Delay(TimeSpan.FromSeconds(searchDelay), cancellationToken: _searchCancellationTokenSource.Token);
+            
+            // Если таймер не был отменен, выполняем поиск
+            if (!_searchCancellationTokenSource.Token.IsCancellationRequested)
+            {
+                Logger.Log("Executing search after delay", "HomeScreen");
+                UpdateViews();
+            }
+        }
+        catch (OperationCanceledException)
+        {
+            // Поиск был отменен - это нормально, ничего не делаем
+            Logger.Log("Search cancelled due to new input", "HomeScreen");
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError($"Error in search delay: {ex.Message}", "HomeScreen");
+        }
+        finally
+        {
+            _isSearching = false;
+        }
+    }
+    
+    private void OnDestroy()
+    {
+        // Очищаем ресурсы при уничтожении объекта
+        CancelPreviousSearch();
     }
 }

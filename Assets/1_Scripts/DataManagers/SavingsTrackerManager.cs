@@ -1,7 +1,8 @@
-using System;
+п»їusing System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using UnityEngine;
 
 public class SavingsTrackerManager : IDataManager
 {
@@ -157,11 +158,11 @@ public class SavingsTrackerManager : IDataManager
     }
 
     /// <summary>
-    /// Возвращает общую потраченную сумму за указанный месяц.
+    /// Р’РѕР·РІСЂР°С‰Р°РµС‚ РѕР±С‰СѓСЋ РїРѕС‚СЂР°С‡РµРЅРЅСѓСЋ СЃСѓРјРјСѓ Р·Р° СѓРєР°Р·Р°РЅРЅС‹Р№ РјРµСЃСЏС†.
     /// </summary>
-    /// <param name="year">Год для фильтрации.</param>
-    /// <param name="month">Месяц для фильтрации (1-12).</param>
-    /// <returns>Общая потраченная сумма (на основе DiscountedPrice).</returns>
+    /// <param name="year">Р“РѕРґ РґР»СЏ С„РёР»СЊС‚СЂР°С†РёРё.</param>
+    /// <param name="month">РњРµСЃСЏС† РґР»СЏ С„РёР»СЊС‚СЂР°С†РёРё (1-12).</param>
+    /// <returns>РћР±С‰Р°СЏ РїРѕС‚СЂР°С‡РµРЅРЅР°СЏ СЃСѓРјРјР° (РЅР° РѕСЃРЅРѕРІРµ DiscountedPrice).</returns>
     public float GetTotalSpentForMonth(int year, int month)
     {
         var filtered = _appData.Reservations
@@ -174,12 +175,6 @@ public class SavingsTrackerManager : IDataManager
         return filtered.Sum(r => r.OriginalPrice.Amount * r.Quantity);
     }
 
-    /// <summary>
-    /// Возвращает общую сэкономленную сумму за указанный месяц.
-    /// </summary>
-    /// <param name="year">Год для фильтрации.</param>
-    /// <param name="month">Месяц для фильтрации (1-12).</param>
-    /// <returns>Общая сэкономленная сумма (разница между OriginalPrice и DiscountedPrice).</returns>
     public float GetTotalSavedForMonth(int year, int month)
     {
         var filtered = _appData.Reservations
@@ -189,6 +184,11 @@ public class SavingsTrackerManager : IDataManager
                 return createdAt.Year == year && createdAt.Month == month;
             });
 
-        return filtered.Sum(r => (r.OriginalPrice.Amount - r.DiscountedPrice.Amount) * r.Quantity);
+        // вњ… Р—Р°С‰РёС‚Р° РѕС‚ РѕС‚СЂРёС†Р°С‚РµР»СЊРЅС‹С… Р·РЅР°С‡РµРЅРёР№
+        return Mathf.Max(0, filtered.Sum(r =>
+        {
+            var saving = (r.OriginalPrice.Amount - r.DiscountedPrice.Amount) * r.Quantity;
+            return Mathf.Max(0, saving); // РќРµ СѓС‡РёС‚С‹РІР°РµРј РѕС‚СЂРёС†Р°С‚РµР»СЊРЅС‹Рµ СЃР±РµСЂРµР¶РµРЅРёСЏ
+        }));
     }
 }

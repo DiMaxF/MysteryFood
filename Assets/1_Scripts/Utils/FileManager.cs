@@ -110,8 +110,56 @@ public class FileManager : MonoBehaviour
             return await tcs.Task;
 #else
             byte[] imageBytes = isBase64 ? Convert.FromBase64String(data) : File.ReadAllBytes(data);
-            Logger.Log($"Writing {imageBytes.Length} bytes to: {savePath}", "FileManager");
-            await File.WriteAllBytesAsync(savePath, imageBytes);
+            
+            Texture2D originalTexture = new Texture2D(2, 2);
+            if (!originalTexture.LoadImage(imageBytes))
+            {
+                Logger.LogError("Failed to load image data", "FileManager");
+                Destroy(originalTexture);
+                return null;
+            }
+            
+            int maxWidth = 1920;
+            int maxHeight = 1080;
+            int quality = 75;
+            
+            int newWidth = originalTexture.width;
+            int newHeight = originalTexture.height;
+            
+            if (originalTexture.width > maxWidth || originalTexture.height > maxHeight)
+            {
+                float aspectRatio = (float)originalTexture.width / originalTexture.height;
+                if (originalTexture.width > originalTexture.height)
+                {
+                    newWidth = maxWidth;
+                    newHeight = Mathf.RoundToInt(maxWidth / aspectRatio);
+                }
+                else
+                {
+                    newHeight = maxHeight;
+                    newWidth = Mathf.RoundToInt(maxHeight * aspectRatio);
+                }
+            }
+            
+            Texture2D resizedTexture = new Texture2D(newWidth, newHeight, TextureFormat.RGB24, false);
+            
+            RenderTexture renderTexture = RenderTexture.GetTemporary(newWidth, newHeight);
+            Graphics.Blit(originalTexture, renderTexture);
+            
+            RenderTexture.active = renderTexture;
+            resizedTexture.ReadPixels(new Rect(0, 0, newWidth, newHeight), 0, 0);
+            resizedTexture.Apply();
+            
+            RenderTexture.active = null;
+            RenderTexture.ReleaseTemporary(renderTexture);
+            
+            byte[] compressedBytes = resizedTexture.EncodeToJPG(quality);
+            
+            Destroy(originalTexture);
+            Destroy(resizedTexture);
+            
+            Logger.Log($"Compressed image from {imageBytes.Length} to {compressedBytes.Length} bytes", "FileManager");
+            await File.WriteAllBytesAsync(savePath, compressedBytes);
             return savePath;
 #endif
         }

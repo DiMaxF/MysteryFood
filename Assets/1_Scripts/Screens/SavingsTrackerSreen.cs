@@ -1,7 +1,9 @@
 using Cysharp.Threading.Tasks;
 using DG.Tweening;
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Globalization;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -44,9 +46,22 @@ public class SavingsTrackerSreen : AppScreen
         foreach (var a in list) 
         {
             var v = Data.VenueManager.GetById(a.VenueId);
-            l.Add(new TableElement.Data(a.CreatedAt, v.Name, a.Quantity.ToString(), $"{a.OriginalPrice.Amount - a.DiscountedPrice.Amount} {a.DiscountedPrice.Currency}"));
+            l.Add(new TableElement.Data(ConvertDateFormat(a.CreatedAt), v.Name, a.Quantity.ToString(), $"{a.OriginalPrice.Amount - a.DiscountedPrice.Amount} {a.DiscountedPrice.Currency}"));
         }
         return l;
+    }
+
+    private string ConvertDateFormat(string createdAt)
+    {
+        try
+        {
+            DateTime date = DateTime.ParseExact(createdAt, DateTimeUtils.Full, CultureInfo.InvariantCulture);
+            return date.ToString("dd MMM yy", CultureInfo.InvariantCulture);
+        }
+        catch (FormatException)
+        {
+            return createdAt; 
+        }
     }
 
     protected override void UpdateViews()

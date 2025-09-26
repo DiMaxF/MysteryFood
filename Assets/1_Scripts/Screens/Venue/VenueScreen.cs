@@ -42,7 +42,7 @@ public class VenueScreen : AppScreen
         base.UpdateViews();
         if (_model == null) return;
         _name.text = _model.Name;
-        _location.text = _model.Location.Address;
+        _location.text = ShortString(_model.Location.Address, 30);
         UIContainer.InitView(_phone, _model.Phone.ToString());
         Logger.Log("Int Phone: " + _model.Phone, "PHONE");
 
@@ -67,7 +67,16 @@ public class VenueScreen : AppScreen
 
         UIContainer.SubscribeToView(_reserveForPickup, (object _) => OnButtonReserveForPickup());
     }
+    public string ShortString(string input, int length)
+    {
+        if (string.IsNullOrEmpty(input) || length <= 0)
+            return string.Empty;
 
+        if (input.Length <= length)
+            return input;
+
+        return input.Substring(0, length) + "...";
+    }
     private void OnButtonBack()
     {
         Container.Show<HomeScreen>();

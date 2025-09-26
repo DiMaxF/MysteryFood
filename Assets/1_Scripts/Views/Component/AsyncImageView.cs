@@ -85,7 +85,7 @@ public class AsyncImageView : View
                 return;
             }
 
-            byte[] imageBytes = File.ReadAllBytes(path);
+            byte[] imageBytes = await File.ReadAllBytesAsync(path);
             Texture2D texture = new Texture2D(2, 2);
             if (texture.LoadImage(imageBytes))
             {
@@ -94,9 +94,10 @@ public class AsyncImageView : View
             else TriggerError();
             Loading(false);
         }
-        catch (Exception ex) 
+        catch (Exception ex)
         {
-        
+            Logger.LogError($"Error loading image: {ex.Message}", "AsyncImageView");
+            TriggerError();
         }
     }
 

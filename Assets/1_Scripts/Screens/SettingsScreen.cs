@@ -80,7 +80,13 @@ public class SettingsScreen : AppScreen
 
     private void SetCurrency(Currency currency)
     {
+        if (Data.PersonalManager.Currency != currency) 
+        {
+            Data.ReservationManager.UpdateCurrency(_selectedCurrency);
+            Data.VenueManager.UpdateCurrency(_selectedCurrency);
+        }
         Data.PersonalManager.Currency = currency;
+        
         Data.SaveData();
         UpdateCurrencyToggles();
     }
@@ -91,17 +97,13 @@ public class SettingsScreen : AppScreen
         UIContainer.InitView(_egp, _selectedCurrency == Currency.EGP);
         UIContainer.InitView(_eur, _selectedCurrency == Currency.EUR);
         UIContainer.InitView(_usd, _selectedCurrency == Currency.USD);
-
-        Data.ReservationManager.UpdateCurrency(_selectedCurrency);
-        Data.VenueManager.UpdateCurrency(_selectedCurrency);
-        Data.SaveData();
     }
 
     private void SetNotification(int min)
     {
         Data.PersonalManager.Notification = min;
-        Data.SaveData();
         UpdateNotificationsToggles();
+        Data.SaveData();
     }
 
     private void UpdateNotificationsToggles()
@@ -173,6 +175,7 @@ public class SettingsScreen : AppScreen
             _textConfirmPanel.Show();
             UIContainer.InitView(_textConfirmPanel, "");
             UIContainer.SubscribeToView<TextConfirmPanel, bool>(_textConfirmPanel, ClearData);
+            PlayerPrefs.DeleteAll();
         } 
         _confirmPanel.Hide();
     }

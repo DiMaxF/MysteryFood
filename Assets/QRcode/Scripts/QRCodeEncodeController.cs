@@ -122,17 +122,17 @@ public class QRCodeEncodeController : MonoBehaviour {
 			m_EncodedTex = null;
 		}
 		m_EncodedTex = new Texture2D(byteMatrix.Width,  byteMatrix.Height);
-	
+		var qrColor = new Color(33f/255f, 33f / 255f, 33f / 255f);
 		for (int i =0; i!= m_EncodedTex.width; i++) {
 			for(int j = 0;j!= m_EncodedTex.height;j++)
 			{
 				if(byteMatrix[i,j])
 				{
-					m_EncodedTex.SetPixel(i,j,Color.black);
+					m_EncodedTex.SetPixel(i,j,Color.white);
 				}
 				else
 				{
-					m_EncodedTex.SetPixel(i,j,Color.white);
+					m_EncodedTex.SetPixel(i,j, qrColor);
 				}
 			}
 		}

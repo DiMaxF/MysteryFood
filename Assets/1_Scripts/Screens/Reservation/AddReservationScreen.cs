@@ -49,14 +49,14 @@ public class AddReservationScreen : AppScreen
         {
             _model = new ReservationModel();
             _model.VenueId = _venueModel.Id;
-            _model.StartTime = _venueModel.StartTime;   
-            _model.EndTime = _venueModel.EndTime;   
+            _model.StartTime = _venueModel.StartTime;
+            _model.EndTime = _venueModel.EndTime;
         }
         _qrCodeEncodeController.onQREncodeFinished.RemoveAllListeners();
         _qrCodeEncodeController.onQREncodeFinished.AddListener(
             (texture) =>
             {
-                HadnleTextureQR(texture);
+                HandleTextureQR(texture);
             }
         );
         base.OnStart();
@@ -66,19 +66,22 @@ public class AddReservationScreen : AppScreen
 
         if (Data.PersonalManager.PermissionLocation)
         {
-            if(_venueModel.Location.Latitude != 0)  _distance.text = $"{Data.PersonalManager.CalculateDistance(_venueModel.Location):F2} km";
+            if (_venueModel.Location.Latitude != 0) _distance.text = $"{Data.PersonalManager.CalculateDistance(_venueModel.Location):F2} km";
             else _distance.text = "—";
         }
-        else 
+        else
         {
-            _distance.text = "—";   
+            _distance.text = "—";
         }
         UIContainer.InitView(_timeStartInput, _venueModel.StartTime);
         UIContainer.InitView(_timeEndInput, _venueModel.EndTime);
         UIContainer.InitView(_notificationToggle, _model.Notification);
-        _model.OriginalPrice = _venueModel.Price;   
+        _model.OriginalPrice = _venueModel.Price;
     }
-
+    public void Clear() 
+    {
+        _model = null;
+    }
     protected override void Subscriptions()
     {
         base.Subscriptions();
@@ -94,12 +97,11 @@ public class AddReservationScreen : AppScreen
         UIContainer.SubscribeToView<InputTextView, string>(_discountedPrice, OnDiscountedPriceEdit);
         UIContainer.SubscribeToView<InputTextView, string>(_notes, OnNotesEdit);
         UIContainer.SubscribeToView<ToggleView, bool>(_notificationToggle, OnToggleNotification);
-
     }
 
-    private void OnToggleNotification(bool val) 
+    private void OnToggleNotification(bool val)
     {
-        if (Data.PersonalManager.Notification == -1 && val) 
+        if (Data.PersonalManager.Notification == -1 && val)
         {
             UIContainer.InitView(_toast, "Notifications disabled. You can enable them in Settings");
             _toast.Show();
@@ -120,22 +122,23 @@ public class AddReservationScreen : AppScreen
         UIContainer.InitView(_timeStartInput, _model.StartTime);
         UIContainer.InitView(_timeEndInput, _model.EndTime);
 
-        UIContainer.InitView(_discountedPrice, _model.DiscountedPrice.Amount == 0 ? "" : _model.DiscountedPrice.ToString());
+        UIContainer.InitView(_discountedPrice, _model.DiscountedPrice.Amount == 0 ? "" : _model.DiscountedPrice.Amount.ToString());
         if (_venueModel.Price.Amount != 0) UIContainer.InitView(_originalPrice, _venueModel.Price.Amount.ToString());
-        else UIContainer.InitView(_originalPrice, _model.OriginalPrice.Amount == 0 ? "" : _model.OriginalPrice.ToString());
+        else UIContainer.InitView(_originalPrice, _model.OriginalPrice.Amount == 0 ? "" : _model.OriginalPrice.Amount.ToString());
         UIContainer.InitView(_notes, _model.Notes);
 
+        UpdatePrices();
     }
 
-    private void UpdatePrices() 
+    private void UpdatePrices()
     {
-        if (!int.TryParse(_originalPrice.text, out var orPrice)) 
+        if (!int.TryParse(_originalPrice.text, out var orPrice))
         {
             _saveMoney.text = "—";
             _price.text = "—";
             return;
         }
-        
+
         if (!int.TryParse(_discountedPrice.text, out var disPrice))
         {
             _saveMoney.text = "—";
@@ -211,14 +214,13 @@ public class AddReservationScreen : AppScreen
         Container.Back().Forget();
     }
 
-    private void SaveWithQr(string qrPath) 
+    private void SaveWithQr(string qrPath)
     {
+
         _model.CreatedAt = DateTime.Now.ToString(DateTimeUtils.Full);
         _model.QrPath = qrPath;
         Data.ReservationManager.Add(_model);
         Data.SaveData();
-
-
         var screen = Container.GetScreen<QrReservationScreen>();
         screen.SetModel(_model);
         Container.Show(screen);
@@ -230,13 +232,11 @@ public class AddReservationScreen : AppScreen
         {
             var hash = $"ID-{_model.Id}, Address: {_venueModel.Location.Address}, Time: {_model.StartTime}-{_model.EndTime}";
             int errorlog = _qrCodeEncodeController.Encode(hash);
-            //wait while saving qr, go ti SaveWithjQr
+            //wait while saving qr, go to SaveWithQr
         }
     }
 
     #endregion
-
-
     private bool ValidateModel()
     {
         _timeStartInput.DefaultColor();
@@ -247,16 +247,16 @@ public class AddReservationScreen : AppScreen
         {
             return InputError(_timeStartInput);
         }
-        if (_timeEndInput.text == "" || !TimeSpan.TryParse(_timeStartInput.text, out var endTime))
+        if (_timeEndInput.text == "" || !TimeSpan.TryParse(_timeEndInput.text, out var endTime))
         {
             return InputError(_timeEndInput);
         }
 
-        if (startTime.Hours > endTime.Hours) 
+        if (startTime > endTime)
         {
             InputError(_timeStartInput);
             return InputError(_timeEndInput);
-        } 
+        }
         if (_originalPrice.text == "" || !int.TryParse(_originalPrice.text, out var orPrice))
         {
             return InputError(_originalPrice);
@@ -265,7 +265,7 @@ public class AddReservationScreen : AppScreen
         {
             return InputError(_discountedPrice);
         }
-        if (orPrice < disPrice) 
+        if (orPrice < disPrice)
         {
             InputError(_discountedPrice);
             return InputError(_originalPrice);
@@ -281,7 +281,7 @@ public class AddReservationScreen : AppScreen
         return false;
     }
 
-    private async void HadnleTextureQR(Texture2D tex)
+    private async void HandleTextureQR(Texture2D tex)
     {
         if (tex != null)
         {

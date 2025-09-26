@@ -9,11 +9,13 @@ using UnityEngine.Android;
 public class NotificationController : MonoBehaviour
 {
     private NotificationManager _notificationManager;
-    private const string CHANNEL_ID = "channel0"; // Идентификатор канала
+    private PersonalManager _personalManager;
+    private const string CHANNEL_ID = "channel0";
 
     private void Start()
     {
         _notificationManager = DataCore.Instance.NotificationManager;
+        _personalManager = DataCore.Instance.PersonalManager;
         InitializeNotifications();
         RebuildNotificationQueue();
     }
@@ -21,15 +23,14 @@ public class NotificationController : MonoBehaviour
     private void InitializeNotifications()
     {
 #if UNITY_ANDROID
-        // Регистрация канала уведомлений
         var channel = new AndroidNotificationChannel()
         {
             Id = CHANNEL_ID,
-            Name = "Default Channel", // Название канала (видно в настройках уведомлений)
-            Importance = Importance.High, // Уровень важности
-            Description = "Default notification channel for MysteryFood", // Описание канала
-            CanShowBadge = true, // Разрешить отображение бейджей
-            EnableVibration = true // Разрешить вибрацию
+            Name = "Default Channel",
+            Importance = Importance.High, 
+            Description = "Default notification channel for MysteryFood", 
+            CanShowBadge = true,
+            EnableVibration = true 
         };
         AndroidNotificationCenter.RegisterNotificationChannel(channel);
         AndroidNotificationCenter.Initialize();
@@ -88,7 +89,7 @@ public class NotificationController : MonoBehaviour
 
     public void TestNotification()
     {
-        var testNotification = new NotificationModel(UnityEngine.Random.Range(1000, 9999), "Test push", "The test push notification", DateTime.Now.AddSeconds(5));
+        var testNotification = new NotificationModel(UnityEngine.Random.Range(1000, 9999), "Test push", "The test push notification", DateTime.Now.AddSeconds(2));
         ScheduleNotification(testNotification);
         Logger.Log($"Test notification created with ID {testNotification.Id}");
     }
@@ -154,6 +155,7 @@ public class NotificationController : MonoBehaviour
             Logger.LogWarning($"Cannot schedule notification {notification.Id}: Fire time is in the past.");
             return;
         }
+        if (_personalManager.Notification < 0) return;
 #if UNITY_ANDROID
         var androidNotification = new AndroidNotification
         {

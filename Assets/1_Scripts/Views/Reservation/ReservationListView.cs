@@ -35,7 +35,16 @@ public class ReservationListView : View
         _dropdown.Hide();
         base.Init(data);
     }
+    public string ShortString(string input, int length)
+    {
+        if (string.IsNullOrEmpty(input) || length <= 0)
+            return string.Empty;
 
+        if (input.Length <= length)
+            return input;
+
+        return input.Substring(0, length) + "...";
+    }
     public override void UpdateUI()
     {
         base.UpdateUI();
@@ -43,7 +52,7 @@ public class ReservationListView : View
         if (venue == null) return;
         UIContainer.InitView(_image, venue.ImagePath);
         UIContainer.InitView(_status, _model.Status);
-        _venueName.text = venue.Name;
+        _venueName.text = ShortString(venue.Name, 20) ;
         _venueAddress.text = venue.Location.Address;
         _reservationId.text = $"ID-{_model.Id}";
         _reservationTime.text = $"{_model.StartTime}-{_model.EndTime} PM";
